@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Table, Typography, Spin, Space, Tag, Modal, Layout, Row, Col, Card, Timeline, Input, Select, Button, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { Key } from 'react';
-import { CalendarOutlined, SearchOutlined, RightOutlined, LeftOutlined } from '@ant-design/icons';
+import { CalendarOutlined, SearchOutlined, RightOutlined, LeftOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProjectIssues } from '../services/linearClient';
 import Header from '../components/Header';
@@ -224,24 +224,17 @@ const ProjectIssues = () => {
         <Row gutter={24}>
           <Col span={sidebarCollapsed ? 23 : 16}>
             <Space direction="vertical" size="large" style={{ width: '100%', marginBottom: 24 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Title level={2} style={{ 
-                    margin: 0, 
-                    overflow: 'hidden', 
-                    textOverflow: 'ellipsis', 
-                    whiteSpace: 'nowrap',
-                    color: isDarkMode ? '#fff' : undefined 
-                  }}>
-                    {project?.name}
-                  </Title>
-                </div>
-                <Button 
-                  type="text"
-                  icon={sidebarCollapsed ? <LeftOutlined /> : <RightOutlined />}
-                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                  style={{ color: isDarkMode ? '#fff' : undefined }}
-                />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <Title level={2} style={{ margin: 0, color: isDarkMode ? '#fff' : undefined }}>
+                  {project?.name} Issues
+                </Title>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate(`/project/${projectId}/request`)}
+                >
+                  Müşteri İsteği Oluştur
+                </Button>
               </div>
 
               <Space wrap style={{ width: '100%' }}>

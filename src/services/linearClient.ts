@@ -201,3 +201,64 @@ export const getOrganization = async () => {
     return null;
   }
 };
+
+// Issue oluşturma mutation'ı
+export const CREATE_ISSUE = gql`
+  mutation CreateIssue($input: IssueCreateInput!) {
+    issueCreate(input: $input) {
+      success
+      issue {
+        id
+        title
+      }
+    }
+  }
+`;
+
+interface CreateIssueInput {
+  projectId: string;
+  title: string;
+  description: string;
+  priority: 'HIGH' | 'MEDIUM' | 'LOW' | 'NO_PRIORITY';
+}
+
+// Priority değerlerini Linear API'nin beklediği formata çevirme
+const priorityMap = {
+  HIGH: 1,
+  MEDIUM: 2,
+  LOW: 3,
+  NO_PRIORITY: 0,
+};
+
+export const createIssue = async (input: CreateIssueInput) => {
+  try {
+    // Team ID'yi al ve doğru formatta olduğundan emin ol
+    const teamId = import.meta.env.VITE_TEAM_ID?.trim();
+    
+    if (!teamId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(teamId)) {
+      throw new Error('Invalid team ID format. Must be a valid UUID.');
+    }
+
+    const { data } = await client.mutate({
+      mutation: CREATE_ISSUE,
+      variables: {
+        input: {
+          projectId: input.projectId,
+          teamId: teamId,
+          title: input.title,
+          description: input.description,
+          priority: priorityMap[input.priority],
+        },
+      },
+    });
+
+    if (!data?.issueCreate?.success) {
+      throw new Error('Failed to create issue');
+    }
+
+    return data.issueCreate.issue;
+  } catch (error) {
+    console.error('Error creating issue:', error);
+    throw error;
+  }
+};
