@@ -11,21 +11,21 @@ A modern web application that streamlines customer request management through Li
 - Integration with Linear API authentication
 - Role-based access control
 
-### 2. Customer Request Management
-![Create Customer Request](/public/create-customer-request.png)
-
-- Create detailed customer requests with rich text editing
-- Automatic labeling with "Customer Request" tag
-- Priority level assignment
-- Markdown support for request descriptions
-
-### 3. Project Access and Management
+### 2. Project Access and Management
 ![Customer Access](/public/customer-access.png)
 
 - View all accessible projects
 - Filter and search functionality
 - Project status tracking
 - Timeline view for project progress
+
+### 3. Customer Request Management
+![Create Customer Request](/public/create-customer-request.png)
+
+- Create detailed customer requests with rich text editing
+- Automatic labeling with "Customer Request" tag
+- Priority level assignment
+- Markdown support for request descriptions
 
 ### 4. Administrative Controls
 ![Access Admin](/public/access-admin.png)
