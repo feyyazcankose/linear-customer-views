@@ -66,30 +66,27 @@ export const getProjects = async () => {
 };
 
 export const GET_PROJECT_ISSUES = gql`
-  query ProjectIssues($projectId: String!) {
+  query GetProjectIssues($projectId: String!) {
     project(id: $projectId) {
       id
       name
       description
       startDate
       targetDate
-      issues(filter: { parent: { null: true } }) {
+      state
+      issues {
         nodes {
           id
-          identifier
-          number
           title
           description
-          state {
-            id
-            name
-            color
-            type
-          }
           priority
+          state {
+            name
+            type
+            color
+          }
           labels {
             nodes {
-              id
               name
               color
             }
@@ -100,6 +97,8 @@ export const GET_PROJECT_ISSUES = gql`
             description
             targetDate
           }
+          createdAt
+          updatedAt
         }
       }
       projectMilestones {
@@ -202,6 +201,19 @@ export const getOrganization = async () => {
   }
 };
 
+// Team ID'yi almak için query
+const GET_PROJECT_TEAM = gql`
+  query GetProjectTeam($projectId: String!) {
+    project(id: $projectId) {
+      teams {
+        nodes {
+          id
+        }
+      }
+    }
+  }
+`;
+
 // Issue oluşturma mutation'ı
 export const CREATE_ISSUE = gql`
   mutation CreateIssue($input: IssueCreateInput!) {
@@ -232,12 +244,27 @@ const priorityMap = {
 
 export const createIssue = async (input: CreateIssueInput) => {
   try {
-    // Team ID'yi al ve doğru formatta olduğundan emin ol
-    const teamId = import.meta.env.VITE_TEAM_ID?.trim();
-    
-    if (!teamId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(teamId)) {
-      throw new Error('Invalid team ID format. Must be a valid UUID.');
+    // Önce projenin team ID'sini al
+    const teamResponse = await client.query({
+      query: GET_PROJECT_TEAM,
+      variables: { projectId: input.projectId }
+    });
+
+    console.log('Team response:', teamResponse);
+
+    const teams = teamResponse.data?.project?.teams?.nodes;
+    if (!teams || teams.length === 0) {
+      throw new Error('Could not get team ID from project');
     }
+
+    // İlk team'i kullan
+    const teamId = teams[0].id;
+
+    console.log('Creating issue with:', {
+      ...input,
+      teamId,
+      priority: priorityMap[input.priority]
+    });
 
     const { data } = await client.mutate({
       mutation: CREATE_ISSUE,
@@ -252,13 +279,22 @@ export const createIssue = async (input: CreateIssueInput) => {
       },
     });
 
+    console.log('GraphQL response:', data);
+
     if (!data?.issueCreate?.success) {
-      throw new Error('Failed to create issue');
+      throw new Error('Failed to create issue: No success response from API');
     }
 
     return data.issueCreate.issue;
   } catch (error) {
-    console.error('Error creating issue:', error);
+    console.error('Error details:', {
+      error,
+      input
+    });
+
+    if (error instanceof Error) {
+      throw new Error(`Failed to create issue: ${error.message}`);
+    }
     throw error;
   }
 };

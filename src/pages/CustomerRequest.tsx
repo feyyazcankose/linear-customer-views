@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Form, Input, Button, Select, Typography, Card, message } from 'antd';
 import { useTheme } from '../context/ThemeContext';
 import { useParams } from 'react-router-dom';
@@ -16,10 +16,10 @@ interface CustomerRequestForm {
 }
 
 const priorityOptions = [
-  { label: 'Yüksek', value: 'HIGH' },
-  { label: 'Orta', value: 'MEDIUM' },
-  { label: 'Düşük', value: 'LOW' },
-  { label: 'Önceliksiz', value: 'NO_PRIORITY' },
+  { label: 'High', value: 'HIGH' },
+  { label: 'Medium', value: 'MEDIUM' },
+  { label: 'Low', value: 'LOW' },
+  { label: 'No Priority', value: 'NO_PRIORITY' },
 ];
 
 export default function CustomerRequest() {
@@ -37,20 +37,33 @@ export default function CustomerRequest() {
     setLoading(true);
     try {
       const title = `[CS] ${values.title}`;
-      const description = `**Müşteri Adı:** ${values.customerName}\n\n${values.description}`;
+      const description = `**Customer Name:** ${values.customerName}\n\n${values.description}`;
 
-      await createIssue({
+      console.log('Creating issue with:', {
+        projectId,
+        title,
+        description,
+        priority: values.priority
+      });
+
+      const result = await createIssue({
         projectId,
         title,
         description,
         priority: values.priority,
       });
 
-      message.success('İstek başarıyla gönderildi');
+      console.log('Issue creation result:', result);
+
+      message.success('Request created successfully');
       form.resetFields();
     } catch (error) {
-      console.error('Error creating issue:', error);
-      message.error('İstek gönderilirken bir hata oluştu');
+      console.error('Detailed error:', error);
+      if (error instanceof Error) {
+        message.error(`Error: ${error.message}`);
+      } else {
+        message.error('Failed to create request');
+      }
     } finally {
       setLoading(false);
     }
@@ -59,7 +72,7 @@ export default function CustomerRequest() {
   return (
     <>
       <Helmet>
-        <title>Müşteri İsteği - Linear View</title>
+        <title>Create Customer Request - Linear View</title>
       </Helmet>
 
       <div style={{ 
@@ -71,7 +84,7 @@ export default function CustomerRequest() {
           marginBottom: '24px',
           color: isDarkMode ? '#fff' : undefined 
         }}>
-          Müşteri İsteği Oluştur
+          Create Customer Request
         </Title>
 
         <Card
@@ -88,11 +101,11 @@ export default function CustomerRequest() {
           >
             <Form.Item
               name="title"
-              label={<Text style={{ color: isDarkMode ? '#fff' : undefined }}>Başlık</Text>}
-              rules={[{ required: true, message: 'Lütfen bir başlık girin' }]}
+              label={<Text style={{ color: isDarkMode ? '#fff' : undefined }}>Title</Text>}
+              rules={[{ required: true, message: 'Please enter a title' }]}
             >
               <Input 
-                placeholder="İstek başlığı"
+                placeholder="Request title"
                 style={{ 
                   background: isDarkMode ? '#141414' : '#fff',
                   borderColor: isDarkMode ? '#303030' : undefined,
@@ -103,12 +116,12 @@ export default function CustomerRequest() {
 
             <Form.Item
               name="description"
-              label={<Text style={{ color: isDarkMode ? '#fff' : undefined }}>Açıklama</Text>}
-              rules={[{ required: true, message: 'Lütfen bir açıklama girin' }]}
+              label={<Text style={{ color: isDarkMode ? '#fff' : undefined }}>Description</Text>}
+              rules={[{ required: true, message: 'Please enter a description' }]}
             >
               <TextArea 
                 rows={4}
-                placeholder="İstek detayları"
+                placeholder="Request details"
                 style={{ 
                   background: isDarkMode ? '#141414' : '#fff',
                   borderColor: isDarkMode ? '#303030' : undefined,
@@ -119,11 +132,11 @@ export default function CustomerRequest() {
 
             <Form.Item
               name="customerName"
-              label={<Text style={{ color: isDarkMode ? '#fff' : undefined }}>Müşteri Adı</Text>}
-              rules={[{ required: true, message: 'Lütfen müşteri adını girin' }]}
+              label={<Text style={{ color: isDarkMode ? '#fff' : undefined }}>Customer Name</Text>}
+              rules={[{ required: true, message: 'Please enter customer name' }]}
             >
               <Input 
-                placeholder="Müşteri adı"
+                placeholder="Customer name"
                 style={{ 
                   background: isDarkMode ? '#141414' : '#fff',
                   borderColor: isDarkMode ? '#303030' : undefined,
@@ -134,8 +147,8 @@ export default function CustomerRequest() {
 
             <Form.Item
               name="priority"
-              label={<Text style={{ color: isDarkMode ? '#fff' : undefined }}>Öncelik</Text>}
-              rules={[{ required: true, message: 'Lütfen bir öncelik seviyesi seçin' }]}
+              label={<Text style={{ color: isDarkMode ? '#fff' : undefined }}>Priority</Text>}
+              rules={[{ required: true, message: 'Please select a priority level' }]}
             >
               <Select
                 options={priorityOptions}
@@ -150,7 +163,7 @@ export default function CustomerRequest() {
                 loading={loading}
                 block
               >
-                İsteği Gönder
+                Submit Request
               </Button>
             </Form.Item>
           </Form>

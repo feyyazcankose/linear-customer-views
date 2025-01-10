@@ -38,9 +38,13 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const formatDate = (date: string | null) => {
-  if (!date) return 'Not set';
-  return dayjs(date).format('MMM D, YYYY');
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleString('tr-TR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
 };
 
 export default function Projects() {

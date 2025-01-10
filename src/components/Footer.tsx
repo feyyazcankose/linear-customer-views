@@ -1,4 +1,3 @@
-import React from 'react';
 import { Typography } from 'antd';
 import { useTheme } from '../context/ThemeContext';
 
