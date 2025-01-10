@@ -142,6 +142,14 @@ export const GET_PROJECT_ISSUE_COUNT = gql`
   }
 `;
 
+export const GET_PROJECT_EXISTS = gql`
+  query CheckProject($projectId: String!) {
+    project(id: $projectId) {
+      id
+    }
+  }
+`;
+
 export const getProjectIssues = async (projectId: string) => {
   try {
     // Proje erişim kontrolü
@@ -177,18 +185,34 @@ export const getProjectIssueCount = async (projectId: string) => {
 export const checkProjectExists = async (projectId: string): Promise<boolean> => {
   try {
     const { data } = await client.query({
-      query: gql`
-        query CheckProject($projectId: String!) {
-          project(id: $projectId) {
-            id
-          }
-        }
-      `,
-      variables: { projectId }
+      query: GET_PROJECT_EXISTS,
+      variables: { projectId },
     });
     return !!data.project;
   } catch (error) {
     console.error('Error checking project:', error);
     return false;
+  }
+};
+
+export const GET_ORGANIZATION = gql`
+  query Organization {
+    organization {
+      id
+      name
+      logoUrl
+    }
+  }
+`;
+
+export const getOrganization = async () => {
+  try {
+    const { data } = await client.query({
+      query: GET_ORGANIZATION,
+    });
+    return data.organization;
+  } catch (error) {
+    console.error('Error fetching organization:', error);
+    return null;
   }
 };
