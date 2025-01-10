@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Table, Typography, Spin, Space, Tag, Modal, Layout, Row, Col, Card, Timeline, Input, Select, Button } from 'antd';
+import { Table, Typography, Spin, Space, Tag, Modal, Layout, Row, Col, Card, Timeline, Input, Select, Button, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { Key } from 'react';
 import { CalendarOutlined, SearchOutlined, RightOutlined, LeftOutlined } from '@ant-design/icons';
@@ -8,6 +8,8 @@ import { getProjectIssues } from '../services/linearClient';
 import Header from '../components/Header';
 import useDebounce from '../hooks/useDebounce';
 import MarkdownContent from '../components/MarkdownContent';
+import { useTheme } from '../context/ThemeContext';
+import Loader from '../components/Loader';
 
 const { Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -73,6 +75,7 @@ const ProjectIssues = () => {
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const [selectedMilestones, setSelectedMilestones] = useState<string[]>([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { isDarkMode } = useTheme();
 
   const debouncedSearchText = useDebounce(searchText, 300);
   const debouncedLabels = useDebounce(selectedLabels, 300);
@@ -202,11 +205,7 @@ const ProjectIssues = () => {
   }, [project, debouncedSearchText, debouncedLabels, debouncedStates, debouncedMilestones]);
 
   if (loading) {
-    return (
-      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Spin size="large" />
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!project) {
@@ -214,14 +213,26 @@ const ProjectIssues = () => {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Content style={{ padding: '24px' }}>
+    <Layout style={{ 
+      minHeight: '100vh',
+      backgroundColor: isDarkMode ? '#141414' : undefined 
+    }}>
+      <Content style={{ 
+        padding: '24px',
+        backgroundColor: isDarkMode ? '#141414' : undefined 
+      }}>
         <Row gutter={24}>
           <Col span={sidebarCollapsed ? 23 : 16}>
             <Space direction="vertical" size="large" style={{ width: '100%', marginBottom: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <Title level={2} style={{ margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <Title level={2} style={{ 
+                    margin: 0, 
+                    overflow: 'hidden', 
+                    textOverflow: 'ellipsis', 
+                    whiteSpace: 'nowrap',
+                    color: isDarkMode ? '#fff' : undefined 
+                  }}>
                     {project?.name}
                   </Title>
                 </div>
@@ -229,16 +240,22 @@ const ProjectIssues = () => {
                   type="text"
                   icon={sidebarCollapsed ? <LeftOutlined /> : <RightOutlined />}
                   onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  style={{ color: isDarkMode ? '#fff' : undefined }}
                 />
               </div>
 
               <Space wrap style={{ width: '100%' }}>
                 <Input
                   placeholder="Search issues"
-                  prefix={<SearchOutlined />}
+                  prefix={<SearchOutlined style={{ color: isDarkMode ? '#fff' : undefined }} />}
                   value={searchText}
                   onChange={e => setSearchText(e.target.value)}
-                  style={{ width: 200 }}
+                  style={{ 
+                    width: 200,
+                    backgroundColor: isDarkMode ? '#1f1f1f' : undefined,
+                    borderColor: isDarkMode ? '#303030' : undefined,
+                    color: isDarkMode ? '#fff' : undefined
+                  }}
                 />
                 <Select
                   mode="multiple"
@@ -276,16 +293,20 @@ const ProjectIssues = () => {
                     .filter(milestone => selectedMilestones.includes(milestone.id))
                     .map(milestone => (
                       <div key={milestone.id}>
-                        <Title level={3}>{milestone.name}</Title>
+                        <Title level={3} style={{ color: isDarkMode ? '#fff' : undefined }}>
+                          {milestone.name}
+                        </Title>
                         {milestone.description && (
-                          <Paragraph>{milestone.description}</Paragraph>
+                          <Paragraph style={{ color: isDarkMode ? '#fff' : undefined }}>
+                            {milestone.description}
+                          </Paragraph>
                         )}
                       </div>
                     ))}
                 </div>
               ) : (
                 project?.description && (
-                  <Typography.Paragraph>
+                  <Typography.Paragraph style={{ color: isDarkMode ? '#fff' : undefined }}>
                     {project.description}
                   </Typography.Paragraph>
                 )
@@ -306,14 +327,20 @@ const ProjectIssues = () => {
               <Card 
                 title={
                   <Space>
-                    <CalendarOutlined />
-                    <span>Project Timeline</span>
+                    <CalendarOutlined style={{ color: isDarkMode ? '#fff' : undefined }} />
+                    <span style={{ color: isDarkMode ? '#fff' : undefined }}>Project Timeline</span>
                   </Space>
                 }
+                style={{
+                  backgroundColor: isDarkMode ? '#1f1f1f' : undefined,
+                  borderColor: isDarkMode ? '#303030' : undefined
+                }}
               >
                 <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                   <div>
-                    <Text type="secondary">Project Duration</Text>
+                    <Text type="secondary" style={{ color: isDarkMode ? '#999' : undefined }}>
+                      Project Duration
+                    </Text>
                     <div style={{ marginTop: 4 }}>
                       {project?.startDate && (
                         <Tag color="blue">
@@ -329,14 +356,18 @@ const ProjectIssues = () => {
                   </div>
 
                   <div>
-                    <Text strong>Milestones</Text>
+                    <Text strong style={{ color: isDarkMode ? '#fff' : undefined }}>
+                      Milestones
+                    </Text>
                     <Timeline style={{ marginTop: 16 }}>
                       <Timeline.Item>
                         <div 
                           onClick={() => setSelectedMilestones([])} 
                           style={{ cursor: 'pointer' }}
                         >
-                          <Text strong>All Issues</Text>
+                          <Text strong style={{ color: isDarkMode ? '#fff' : undefined }}>
+                            All Issues
+                          </Text>
                         </div>
                       </Timeline.Item>
                       {project?.projectMilestones.nodes
@@ -352,16 +383,20 @@ const ProjectIssues = () => {
                               onClick={() => setSelectedMilestones([milestone.id])}
                               style={{ cursor: 'pointer' }}
                             >
-                              <Text strong>
+                              <Text strong style={{ color: isDarkMode ? '#fff' : undefined }}>
                                 {milestone.name}
                               </Text>
                               {milestone.targetDate && (
-                                <div style={{ fontSize: '12px', color: '#666', marginTop: 4 }}>
+                                <div style={{ fontSize: '12px', color: isDarkMode ? '#999' : '#666', marginTop: 4 }}>
                                   Target: {new Date(milestone.targetDate).toLocaleDateString()}
                                 </div>
                               )}
                               {milestone.description && (
-                                <Paragraph type="secondary" style={{ marginTop: 4, marginBottom: 0 }}>
+                                <Paragraph type="secondary" style={{ 
+                                  marginTop: 4, 
+                                  marginBottom: 0,
+                                  color: isDarkMode ? '#999' : undefined 
+                                }}>
                                   {milestone.description}
                                 </Paragraph>
                               )}
@@ -382,11 +417,16 @@ const ProjectIssues = () => {
           onCancel={() => setIsModalVisible(false)}
           footer={null}
           width={800}
+          style={{ 
+            backgroundColor: isDarkMode ? '#1f1f1f' : undefined
+          }}
         >
           {selectedIssue && (
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
               <div>
-                <Typography.Text type="secondary">State</Typography.Text>
+                <Typography.Text type="secondary" style={{ color: isDarkMode ? '#999' : undefined }}>
+                  State
+                </Typography.Text>
                 <div>
                   <Tag color={selectedIssue.state.color}>
                     {selectedIssue.state.name}
@@ -396,56 +436,13 @@ const ProjectIssues = () => {
 
               {selectedIssue.projectMilestone && (
                 <div>
-                  <Typography.Text type="secondary">Milestone</Typography.Text>
+                  <Typography.Text type="secondary" style={{ color: isDarkMode ? '#999' : undefined }}>
+                    Milestone
+                  </Typography.Text>
                   <div>
                     <Tag>
                       {selectedIssue.projectMilestone.name}
-                      {selectedIssue.projectMilestone.targetDate && (
-                        <span style={{ marginLeft: 8, fontSize: '12px', color: '#666' }}>
-                          {new Date(selectedIssue.projectMilestone.targetDate).toLocaleDateString()}
-                        </span>
-                      )}
                     </Tag>
-                    {selectedIssue.projectMilestone.description && (
-                      <div style={{ marginTop: 4, fontSize: '14px', color: '#666' }}>
-                        {selectedIssue.projectMilestone.description}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <Typography.Text type="secondary">Priority</Typography.Text>
-                <div>
-                  <Tag color={
-                    selectedIssue.priority === 0 ? 'gray' :
-                    selectedIssue.priority === 1 ? 'blue' :
-                    selectedIssue.priority === 2 ? 'orange' : 'red'
-                  }>
-                    P{selectedIssue.priority}
-                  </Tag>
-                </div>
-              </div>
-
-              <div>
-                <Typography.Text type="secondary">Labels</Typography.Text>
-                <div>
-                  <Space>
-                    {selectedIssue.labels.nodes.map((label: Label) => (
-                      <Tag key={label.id} color={label.color}>
-                        {label.name}
-                      </Tag>
-                    ))}
-                  </Space>
-                </div>
-              </div>
-
-              {selectedIssue.description && (
-                <div>
-                  <Typography.Text type="secondary">Description</Typography.Text>
-                  <div style={{ marginTop: 8 }}>
-                    <MarkdownContent content={selectedIssue.description} />
                   </div>
                 </div>
               )}

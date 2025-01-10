@@ -1,56 +1,34 @@
-import { ApolloClient, InMemoryCache, gql, createHttpLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 
-const httpLink = createHttpLink({
-  uri: '/graphql',
-  credentials: 'include',
-  headers: {
-    'Content-Type': 'application/json',
-  }
-});
-
-const authLink = setContext((_, { headers }) => {
-  return {
-    headers: {
-      ...headers,
-      'Authorization': import.meta.env.VITE_LINEAR_API_KEY,
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    }
-  }
-});
+interface Project {
+  id: string;
+  name: string;
+  description: string | null;
+  startDate: string | null;
+  targetDate: string | null;
+  state: string;
+}
 
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  uri: 'https://api.linear.app/graphql',
   cache: new InMemoryCache(),
-  defaultOptions: {
-    watchQuery: {
-      fetchPolicy: 'no-cache',
-      errorPolicy: 'ignore',
-    },
-    query: {
-      fetchPolicy: 'no-cache',
-      errorPolicy: 'all',
-    },
-  },
+  headers: {
+    authorization: import.meta.env.VITE_LINEAR_API_KEY || ''
+  }
 });
 
 export const GET_PROJECTS = gql`
-  query Teams {
+  query {
     teams {
       nodes {
-        id
-        name
         projects {
           nodes {
             id
             name
             description
-            icon
-            color
+            startDate
+            targetDate
             state
-            updatedAt
           }
         }
       }
@@ -68,8 +46,16 @@ export const getProjects = async () => {
       throw new Error('No teams found');
     }
     
-    const allProjects = data.teams.nodes.reduce((acc: any[], team: any) => {
-      return [...acc, ...(team.projects?.nodes || [])];
+    const allProjects = data.teams.nodes.reduce((acc: Project[], team: any) => {
+      const projects = team.projects?.nodes || [];
+      return [...acc, ...projects.map((project: any): Project => ({
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        startDate: project.startDate,
+        targetDate: project.targetDate,
+        state: project.state || 'backlog'
+      }))];
     }, []);
 
     return { nodes: allProjects };
@@ -132,7 +118,6 @@ export const GET_PROJECT_ISSUE_COUNT = gql`
   query ProjectIssueCount($projectId: String!) {
     project(id: $projectId) {
       id
-      name
       issues {
         nodes {
           id
@@ -154,8 +139,8 @@ export const getProjectIssues = async (projectId: string) => {
   try {
     // Proje erişim kontrolü
     const projectAccess = localStorage.getItem('projectAccess');
-    if (!projectAccess || (projectAccess !== 'all' && projectAccess !== projectId)) {
-      return null;
+    if (projectAccess !== 'all' && projectAccess !== projectId) {
+      throw new Error('No access to this project');
     }
 
     const { data } = await client.query({

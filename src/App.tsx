@@ -4,16 +4,21 @@ import ProjectIssues from './pages/ProjectIssues';
 import Login from './pages/Login';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme } from 'antd';
+import { ThemeProvider } from './context/ThemeContext';
+import { useTheme } from './context/ThemeContext';
+import { HelmetProvider } from 'react-helmet-async';
 
-function App() {
+const AppContent = () => {
+  const { isDarkMode } = useTheme();
+  
   return (
     <ConfigProvider
       theme={{
         token: {
           colorPrimary: '#0066FF',
         },
-        algorithm: []  // Dark mode kaldırıldı
+        algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm
       }}
     >
       <Router>
@@ -53,13 +58,20 @@ function App() {
           />
 
           {/* Default redirect */}
-          <Route 
-            path="*" 
-            element={<Navigate to="/login" replace />} 
-          />
+          <Route path="/" element={<Navigate to="/projects" replace />} />
         </Routes>
       </Router>
     </ConfigProvider>
+  );
+}
+
+function App() {
+  return (
+    <HelmetProvider>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </HelmetProvider>
   );
 }
 

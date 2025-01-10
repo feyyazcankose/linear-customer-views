@@ -61,6 +61,91 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Dark mode styles */
+html.dark {
+  background-color: #141414;
+  color: #fff;
+}
+
+html.dark .ant-card {
+  background-color: #1f1f1f;
+  border-color: #303030;
+}
+
+html.dark .ant-table {
+  background-color: #1f1f1f;
+}
+
+html.dark .ant-table-thead > tr > th {
+  background-color: #141414 !important;
+  color: #fff;
+  border-bottom: 1px solid #303030;
+}
+
+html.dark .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #303030;
+  color: #fff;
+}
+
+html.dark .ant-table-tbody > tr:hover > td {
+  background-color: #303030 !important;
+}
+
+html.dark .ant-typography {
+  color: #fff;
+}
+
+html.dark .ant-btn-text {
+  color: #fff;
+}
+
+html.dark .ant-btn-text:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark .ant-timeline-item-tail {
+  border-left-color: #303030;
+}
+
+html.dark .ant-input {
+  background-color: #1f1f1f;
+  border-color: #303030;
+  color: #fff;
+}
+
+html.dark .ant-input:hover,
+html.dark .ant-input:focus {
+  border-color: #1668dc;
+}
+
+html.dark .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background-color: #1f1f1f;
+  border-color: #303030;
+  color: #fff;
+}
+
+html.dark .ant-select-dropdown {
+  background-color: #1f1f1f;
+}
+
+html.dark .ant-select-item {
+  color: #fff;
+}
+
+html.dark .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: #303030;
+}
+
+html.dark .ant-modal-content,
+html.dark .ant-modal-header {
+  background-color: #1f1f1f;
+  color: #fff;
+}
+
+html.dark .ant-modal-title {
+  color: #fff;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
