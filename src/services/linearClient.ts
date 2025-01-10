@@ -208,6 +208,12 @@ const GET_PROJECT_TEAM = gql`
       teams {
         nodes {
           id
+          labels {
+            nodes {
+              id
+              name
+            }
+          }
         }
       }
     }
@@ -242,59 +248,109 @@ const priorityMap = {
   NO_PRIORITY: 0,
 };
 
+const CREATE_ISSUE_WITH_LABEL = gql`
+  mutation CreateIssueWithLabel($input: IssueCreateInput!) {
+    issueCreate(input: $input) {
+      success
+      issue {
+        id
+        title
+        description
+        priority
+        labels {
+          nodes {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+const CREATE_LABEL = gql`
+  mutation CreateLabel($input: LabelCreateInput!) {
+    labelCreate(input: $input) {
+      success
+      label {
+        id
+      }
+    }
+  }
+`;
+
+interface LabelCreateInput {
+  name: string;
+  teamId: string;
+  color: string;
+}
+
 export const createIssue = async (input: CreateIssueInput) => {
   try {
-    // Önce projenin team ID'sini al
-    const teamResponse = await client.query({
+    // Önce projenin team bilgisini al
+    const teamData = await client.query({
       query: GET_PROJECT_TEAM,
-      variables: { projectId: input.projectId }
+      variables: {
+        projectId: input.projectId
+      }
     });
 
-    console.log('Team response:', teamResponse);
+    console.log('Team Data:', teamData);
 
-    const teams = teamResponse.data?.project?.teams?.nodes;
-    if (!teams || teams.length === 0) {
-      throw new Error('Could not get team ID from project');
+    if (!teamData.data?.project?.teams?.nodes?.[0]) {
+      throw new Error('Could not find team data for project');
     }
 
-    // İlk team'i kullan
-    const teamId = teams[0].id;
+    const teamId = teamData.data.project.teams.nodes[0].id;
+    const existingLabels = teamData.data.project.teams.nodes[0].labels.nodes;
 
-    console.log('Creating issue with:', {
-      ...input,
-      teamId,
-      priority: priorityMap[input.priority]
-    });
+    // "Customer Request" label'ını bul veya oluştur
+    let customerRequestLabelId = existingLabels.find(
+      (label: { name: string; id: string }) => label.name === "Customer Request"
+    )?.id;
 
-    const { data } = await client.mutate({
-      mutation: CREATE_ISSUE,
+    if (!customerRequestLabelId) {
+      // Label yoksa oluştur
+      const labelResponse = await client.mutate({
+        mutation: CREATE_LABEL,
+        variables: {
+          input: {
+            name: "Customer Request",
+            teamId: teamId,
+            color: "#0052CC" // Mavi renk
+          }
+        }
+      });
+
+      if (!labelResponse.data?.labelCreate?.success) {
+        throw new Error('Failed to create label');
+      }
+
+      customerRequestLabelId = labelResponse.data.labelCreate.label.id;
+    }
+
+    // Issue'yu label ile birlikte oluştur
+    const response = await client.mutate({
+      mutation: CREATE_ISSUE_WITH_LABEL,
       variables: {
         input: {
+          teamId,
           projectId: input.projectId,
-          teamId: teamId,
           title: input.title,
           description: input.description,
           priority: priorityMap[input.priority],
-        },
-      },
+          labelIds: [customerRequestLabelId]
+        }
+      }
     });
 
-    console.log('GraphQL response:', data);
-
-    if (!data?.issueCreate?.success) {
-      throw new Error('Failed to create issue: No success response from API');
+    if (!response.data?.issueCreate?.success) {
+      throw new Error('Failed to create issue');
     }
 
-    return data.issueCreate.issue;
+    return response.data.issueCreate.issue;
   } catch (error) {
-    console.error('Error details:', {
-      error,
-      input
-    });
-
-    if (error instanceof Error) {
-      throw new Error(`Failed to create issue: ${error.message}`);
-    }
+    console.error('Error creating issue:', error);
     throw error;
   }
 };

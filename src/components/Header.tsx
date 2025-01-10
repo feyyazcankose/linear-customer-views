@@ -50,7 +50,6 @@ const Header: React.FC = () => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        position: 'sticky',
         top: 0,
         backgroundColor: isDarkMode ? '#141414' : 'white',
         zIndex: 1000
