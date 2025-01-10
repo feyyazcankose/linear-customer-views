@@ -114,35 +114,6 @@ const ProjectIssues = () => {
       ),
     },
     {
-      title: 'Milestone',
-      dataIndex: 'projectMilestone',
-      key: 'projectMilestone',
-      render: (milestone: ProjectMilestone | undefined) => {
-        if (!milestone) return '-';
-        return (
-          <Tag>
-            {milestone.name}
-            {milestone.targetDate && (
-              <span style={{ marginLeft: 8, fontSize: '12px', color: '#666' }}>
-                {new Date(milestone.targetDate).toLocaleDateString()}
-              </span>
-            )}
-          </Tag>
-        );
-      },
-      filters: project?.issues.nodes
-        .filter(issue => issue.projectMilestone)
-        .map(issue => ({
-          text: issue.projectMilestone?.name || '',
-          value: issue.projectMilestone?.id || ''
-        }))
-        .filter((item, index, self) => 
-          index === self.findIndex(t => t.value === item.value)
-        ),
-      onFilter: (value: Key | boolean, record: Issue) =>
-        record.projectMilestone?.id === value,
-    },
-    {
       title: 'Priority',
       dataIndex: 'priority',
       key: 'priority',
@@ -284,21 +255,40 @@ const ProjectIssues = () => {
                 />
                 <Select
                   mode="multiple"
-                  placeholder="Filter by milestone"
-                  value={selectedMilestones}
-                  onChange={setSelectedMilestones}
+                  placeholder="Filter by label"
+                  value={selectedLabels}
+                  onChange={setSelectedLabels}
                   style={{ width: 200 }}
-                  options={project?.projectMilestones.nodes.map(milestone => ({
-                    label: milestone.name,
-                    value: milestone.id
+                  options={Array.from(
+                    new Set(project?.issues.nodes.flatMap(issue => 
+                      issue.labels.nodes.map(label => label.name)
+                    ))
+                  ).map(label => ({
+                    label: label,
+                    value: label
                   }))}
                 />
               </Space>
 
-              {project?.description && (
-                <Typography.Paragraph>
-                  {project.description}
-                </Typography.Paragraph>
+              {selectedMilestones.length > 0 && project?.projectMilestones.nodes ? (
+                <div style={{ marginBottom: 24 }}>
+                  {project.projectMilestones.nodes
+                    .filter(milestone => selectedMilestones.includes(milestone.id))
+                    .map(milestone => (
+                      <div key={milestone.id}>
+                        <Title level={3}>{milestone.name}</Title>
+                        {milestone.description && (
+                          <Paragraph>{milestone.description}</Paragraph>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                project?.description && (
+                  <Typography.Paragraph>
+                    {project.description}
+                  </Typography.Paragraph>
+                )
               )}
 
               <Table
@@ -341,6 +331,14 @@ const ProjectIssues = () => {
                   <div>
                     <Text strong>Milestones</Text>
                     <Timeline style={{ marginTop: 16 }}>
+                      <Timeline.Item>
+                        <div 
+                          onClick={() => setSelectedMilestones([])} 
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <Text strong>All Issues</Text>
+                        </div>
+                      </Timeline.Item>
                       {project?.projectMilestones.nodes
                         .slice()
                         .sort((a, b) => {
@@ -350,7 +348,10 @@ const ProjectIssues = () => {
                         })
                         .map((milestone: ProjectMilestone) => (
                           <Timeline.Item key={milestone.id}>
-                            <div>
+                            <div 
+                              onClick={() => setSelectedMilestones([milestone.id])}
+                              style={{ cursor: 'pointer' }}
+                            >
                               <Text strong>
                                 {milestone.name}
                               </Text>
