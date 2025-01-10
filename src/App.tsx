@@ -23,7 +23,7 @@ const AppContent = () => {
       }}
     >
       <BrowserRouter>
-        <div style={{ minHeight: '100vh', position: 'relative', paddingBottom: '60px' }}>
+        <div style={{ minHeight: '100vh', position: 'relative', paddingBottom: '60px', background: isDarkMode ? '#141414' : '#fff' }}>
           <Routes>
             {/* Public route */}
             <Route 

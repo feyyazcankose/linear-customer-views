@@ -10,7 +10,6 @@ export default function Footer() {
     <div style={{
       padding: '16px',
       textAlign: 'center',
-      position: 'fixed',
       bottom: 0,
       left: 0,
       right: 0,

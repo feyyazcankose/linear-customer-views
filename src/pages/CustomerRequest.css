@@ -1,0 +1,203 @@
+.editor-wrapper {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.editor-wrapper.dark {
+  border-color: #303030;
+}
+
+.editor-wrapper .mdxeditor {
+  min-height: 200px;
+  background-color: #fff;
+  color: #000;
+}
+
+.editor-wrapper.dark .mdxeditor {
+  background-color: #141414 !important;
+  color: #fff !important;
+}
+
+/* Editor content styles */
+.editor-content {
+  padding: 16px;
+  min-height: 200px;
+  outline: none;
+  background-color: #fff;
+  color: #000;
+}
+
+.editor-content.dark {
+  background-color: #141414 !important;
+  color: #fff !important;
+}
+
+.editor-content.dark [contenteditable="true"] {
+  background-color: #141414 !important;
+  color: #fff !important;
+}
+
+.editor-content:focus {
+  outline: none;
+}
+
+.editor-content p {
+  margin: 8px 0;
+}
+
+/* Toolbar styles */
+.editor-wrapper .mdxeditor-toolbar {
+  border-bottom: 1px solid #d9d9d9;
+  background-color: #fafafa;
+  padding: 8px;
+}
+
+.editor-wrapper.dark .mdxeditor-toolbar {
+  border-color: #303030;
+  background-color: #1f1f1f !important;
+  color: #fff !important;
+}
+
+/* Button styles */
+.editor-wrapper .mdxeditor-toolbar button {
+  color: #000;
+  margin: 0 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.editor-wrapper.dark .mdxeditor-toolbar button {
+  color: #fff !important;
+}
+
+.editor-wrapper.dark .mdxeditor-toolbar button svg {
+  fill: #fff !important;
+}
+
+.editor-wrapper .mdxeditor-toolbar button:hover {
+  background-color: #f0f0f0;
+}
+
+.editor-wrapper.dark .mdxeditor-toolbar button:hover {
+  background-color: #303030;
+}
+
+/* Dropdown styles */
+.editor-wrapper .mdxeditor-toolbar select {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #d9d9d9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 0 4px;
+}
+
+.editor-wrapper.dark .mdxeditor-toolbar select {
+  background-color: #141414 !important;
+  color: #fff !important;
+  border-color: #303030;
+}
+
+/* Content area styles */
+.editor-wrapper .mdxeditor-content-editable {
+  padding: 16px;
+}
+
+/* Link and code styles */
+.editor-wrapper a {
+  color: #1890ff;
+}
+
+.editor-wrapper.dark a {
+  color: #40a9ff;
+}
+
+.editor-wrapper code {
+  background-color: #f5f5f5;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.editor-wrapper.dark code {
+  background-color: #262626;
+}
+
+/* Table styles */
+.editor-wrapper table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.editor-wrapper th,
+.editor-wrapper td {
+  border: 1px solid #d9d9d9;
+  padding: 8px;
+  text-align: left;
+}
+
+.editor-wrapper.dark th,
+.editor-wrapper.dark td {
+  border-color: #303030;
+}
+
+.editor-wrapper th {
+  background-color: #fafafa;
+  font-weight: 600;
+}
+
+.editor-wrapper.dark th {
+  background-color: #1f1f1f;
+}
+
+/* List styles */
+.editor-wrapper ul,
+.editor-wrapper ol {
+  padding-left: 24px;
+  margin: 8px 0;
+}
+
+.editor-wrapper li {
+  margin: 4px 0;
+}
+
+.editor-wrapper ul li {
+  list-style-type: disc;
+}
+
+.editor-wrapper ol li {
+  list-style-type: decimal;
+}
+
+/* Nested list styles */
+.editor-wrapper ul ul,
+.editor-wrapper ol ol,
+.editor-wrapper ul ol,
+.editor-wrapper ol ul {
+  margin: 4px 0;
+}
+
+/* Placeholder styles */
+.editor-content[data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: #999;
+  pointer-events: none;
+}
+
+.editor-content.dark[data-placeholder]:empty::before {
+  color: #666;
+}
+
+/* Dark mode specific overrides */
+.editor-wrapper.dark .mdxeditor * {
+  background-color: #141414 !important;
+  color: #fff !important;
+}
+
+.editor-wrapper.dark .mdxeditor-toolbar * {
+  background-color: #1f1f1f !important;
+}

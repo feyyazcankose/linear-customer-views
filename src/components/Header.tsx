@@ -56,7 +56,7 @@ const Header: React.FC = () => {
         zIndex: 1000
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <NavLink to="/projects" >
+          <NavLink to="/projects" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} >
             {organization?.logoUrl && (
               <img 
                 src={organization.logoUrl} 

@@ -1,12 +1,31 @@
 import { useState } from 'react';
-import { Form, Input, Button, Select, Typography, Card, message } from 'antd';
+import { Form, Input, Button, Select, Typography, Card, message, Space } from 'antd';
 import { useTheme } from '../context/ThemeContext';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { createIssue } from '../services/linearClient';
 import { Helmet } from 'react-helmet-async';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { 
+  MDXEditor, 
+  headingsPlugin, 
+  listsPlugin, 
+  quotePlugin, 
+  thematicBreakPlugin, 
+  markdownShortcutPlugin, 
+  toolbarPlugin, 
+  tablePlugin,
+  UndoRedo, 
+  BoldItalicUnderlineToggles, 
+  BlockTypeSelect, 
+  CreateLink, 
+  InsertImage,
+  InsertTable,
+  ListsToggle
+} from '@mdxeditor/editor';
+import '@mdxeditor/editor/style.css';
+import './CustomerRequest.css';
 
 const { Title, Text } = Typography;
-const { TextArea } = Input;
 
 interface CustomerRequestForm {
   title: string;
@@ -26,7 +45,12 @@ export default function CustomerRequest() {
   const [loading, setLoading] = useState(false);
   const { isDarkMode } = useTheme();
   const { projectId } = useParams<{ projectId: string }>();
+  const navigate = useNavigate();
   const [form] = Form.useForm();
+
+  const onEditorChange = (content: string) => {
+    form.setFieldsValue({ description: content });
+  };
 
   const onFinish = async (values: CustomerRequestForm) => {
     if (!projectId) {
@@ -57,6 +81,8 @@ export default function CustomerRequest() {
 
       message.success('Request created successfully');
       form.resetFields();
+      // Geri dön
+      navigate(`/project/${projectId}/issues`);
     } catch (error) {
       console.error('Detailed error:', error);
       if (error instanceof Error) {
@@ -78,14 +104,30 @@ export default function CustomerRequest() {
       <div style={{ 
         padding: '24px',
         maxWidth: '800px',
-        margin: '0 auto'
+        margin: '0 auto',
+        background: isDarkMode ? '#141414' : '#fff' 
       }}>
-        <Title level={2} style={{ 
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
           marginBottom: '24px',
-          color: isDarkMode ? '#fff' : undefined 
+          gap: '12px'
         }}>
-          Create Customer Request
-        </Title>
+          <Button 
+            icon={<ArrowLeftOutlined />} 
+            onClick={() => navigate(`/project/${projectId}/issues`)}
+            type="text"
+            style={{
+              color: isDarkMode ? '#fff' : undefined,
+            }}
+          />
+          <Title level={2} style={{ 
+            margin: 0,
+            color: isDarkMode ? '#fff' : undefined 
+          }}>
+            Create Customer Request
+          </Title>
+        </div>
 
         <Card
           style={{ 
@@ -119,15 +161,34 @@ export default function CustomerRequest() {
               label={<Text style={{ color: isDarkMode ? '#fff' : undefined }}>Description</Text>}
               rules={[{ required: true, message: 'Please enter a description' }]}
             >
-              <TextArea 
-                rows={4}
-                placeholder="Request details"
-                style={{ 
-                  background: isDarkMode ? '#141414' : '#fff',
-                  borderColor: isDarkMode ? '#303030' : undefined,
-                  color: isDarkMode ? '#fff' : undefined
-                }}
-              />
+              <div className={`editor-wrapper ${isDarkMode ? 'dark' : 'light'}`}>
+                <MDXEditor
+                  onChange={onEditorChange}
+                  markdown=""
+                  contentEditableClassName={`editor-content ${isDarkMode ? 'dark' : 'light'}`}
+                  plugins={[
+                    headingsPlugin(),
+                    listsPlugin(),
+                    quotePlugin(),
+                    thematicBreakPlugin(),
+                    markdownShortcutPlugin(),
+                    tablePlugin(),
+                    toolbarPlugin({
+                      toolbarContents: () => (
+                        <>
+                          <UndoRedo />
+                          <BoldItalicUnderlineToggles />
+                          <BlockTypeSelect />
+                          <CreateLink />
+                          <InsertImage />
+                          <ListsToggle />
+                          <InsertTable />
+                        </>
+                      )
+                    })
+                  ]}
+                />
+              </div>
             </Form.Item>
 
             <Form.Item
