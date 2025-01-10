@@ -74,7 +74,7 @@ export const GET_PROJECT_ISSUES = gql`
       startDate
       targetDate
       state
-      issues {
+      issues(filter: { parent: { null: true } }) {
         nodes {
           id
           title

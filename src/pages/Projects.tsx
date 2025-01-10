@@ -102,7 +102,7 @@ export default function Projects() {
       background: isDarkMode ? '#141414' : '#fff' 
     }}>
       <Layout.Content style={{ 
-        padding: '24px',
+        padding: '0 16px',
         maxWidth: '1400px',
         width: '100%',
         margin: '0 auto',
