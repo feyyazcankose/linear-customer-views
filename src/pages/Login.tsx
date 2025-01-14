@@ -28,11 +28,7 @@ const Login: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    if (defaultTeamId) {
-      form.setFieldsValue({ projectId: defaultTeamId });
-    }
-  }, [defaultTeamId, form]);
+
 
   const handleSubmit = async (values: { projectId: string }) => {
     setLoading(true);
@@ -112,7 +108,7 @@ const Login: React.FC = () => {
                 onFinish={handleSubmit}
                 layout="vertical"
                 requiredMark={false}
-                initialValues={{ projectId: defaultTeamId }}
+                initialValues={{ projectId: "" }}
               >
                 <Form.Item
                   name="projectId"
@@ -128,6 +124,7 @@ const Login: React.FC = () => {
                       borderColor: isDarkMode ? '#333' : '#E5E5E5',
                       fontSize: isMobile ? '14px' : '16px'
                     }}
+                    defaultValue={""}
                   />
                 </Form.Item>
 

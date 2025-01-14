@@ -18,7 +18,7 @@ import {
   Button,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { CalendarOutlined, SearchOutlined } from "@ant-design/icons";
+import { CalendarOutlined, HarmonyOSOutlined, SearchOutlined } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import { getProjectIssues } from "../services/linearClient";
 import { useTheme } from "../context/ThemeContext";
@@ -268,11 +268,24 @@ const ProjectIssues: FC = () => {
             <Spin size="large" />
           </div>
         ) : (
-          <Row gutter={[isMobile ? 12 : 24, isMobile ? 12 : 24]}>
+          <div>
+            <Row gutter={[isMobile ? 12 : 24, isMobile ? 12 : 24]}>
             {/* Sol Taraf - Görevler Tablosu */}
             <Col xs={24} lg={16}>
               <Space direction="vertical" size="large" style={{ width: "100%" }}>
-                <Card>
+                <Card
+                title={
+                  <Space>
+                   <HarmonyOSOutlined />
+                    <span>{projectData?projectData.name:""}</span>
+                  </Space>
+                }
+                style={{
+                  background: isDarkMode ? "#1f1f1f" : "#fff",
+                  position: isMobile ? "relative" : "sticky",
+                  top: 24,
+                }}
+                >
                   <Space direction="vertical" style={{ width: "100%" }}>
                     <Input
                       placeholder={t('project.filters.search_placeholder')}
@@ -426,6 +439,7 @@ const ProjectIssues: FC = () => {
               </Card>
             </Col>
           </Row>
+          </div>
         )}
 
         <Modal
