@@ -48,6 +48,11 @@
     "all_issues": "All Issues",
     "select_milestone": "Select Milestone",
     "all_milestones": "All Milestones",
+    "total_issues": "Total Issues",
+    "completed": "Completed",
+    "in_progress": "In Progress",
+    "progress": "Progress",
+    "no_projects": "No projects found",
     "priority_levels": {
       "no_priority": "No Priority",
       "high": "High",

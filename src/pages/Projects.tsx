@@ -127,7 +127,15 @@ export default function Projects() {
           />
 
           <List
-            grid={{ gutter: 16, column: 3 }}
+            grid={{
+              gutter: 16,
+              xs: 1,  
+              sm: 2,  
+              md: 2,  
+              lg: 3,  
+              xl: 3,  
+              xxl: 4, 
+            }}
             dataSource={filteredProjects}
             renderItem={project => (
               <List.Item style={{ height: '150px' }}>

@@ -84,6 +84,7 @@ const ProjectIssues: FC = () => {
   const [selectedMilestone, setSelectedMilestone] = useState<string>("all");
   const { projectId } = useParams<{ projectId: string }>();
   const { isDarkMode } = useTheme();
+  const isMobile = window.innerWidth < 768;
 
   const debouncedSearchText = useDebounce(searchText, 300);
   const debouncedLabels = useDebounce(selectedLabels, 300);
@@ -261,15 +262,15 @@ const ProjectIssues: FC = () => {
         <title>{projectData ? `${projectData.name} - ${t('project.title')}` : t('common.loading')}</title>
       </Helmet>
 
-      <Layout style={{ padding: "24px", background: isDarkMode ? "#141414" : "#fff" }}>
+      <Layout style={{ padding: isMobile ? "12px" : "24px", background: isDarkMode ? "#141414" : "#fff" }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: "50px" }}>
             <Spin size="large" />
           </div>
         ) : (
-          <Row gutter={[24, 24]}>
+          <Row gutter={[isMobile ? 12 : 24, isMobile ? 12 : 24]}>
             {/* Sol Taraf - Görevler Tablosu */}
-            <Col span={16}>
+            <Col xs={24} lg={16}>
               <Space direction="vertical" size="large" style={{ width: "100%" }}>
                 <Card>
                   <Space direction="vertical" style={{ width: "100%" }}>
@@ -282,7 +283,7 @@ const ProjectIssues: FC = () => {
                     <Space wrap>
                       <Select
                         mode="multiple"
-                        style={{ minWidth: 200 }}
+                        style={{ minWidth: isMobile ? "100%" : 200 }}
                         placeholder={t('project.filters.select_labels')}
                         value={selectedLabels}
                         onChange={setSelectedLabels}
@@ -290,7 +291,7 @@ const ProjectIssues: FC = () => {
                       />
                       <Select
                         mode="multiple"
-                        style={{ minWidth: 200 }}
+                        style={{ minWidth: isMobile ? "100%" : 200 }}
                         placeholder={t('project.filters.select_states')}
                         value={selectedStates}
                         onChange={setSelectedStates}
@@ -301,19 +302,23 @@ const ProjectIssues: FC = () => {
                 </Card>
 
                 <Table
-                  columns={columns}
+                  columns={columns.map(column => ({
+                    ...column,
+                    ellipsis: isMobile,
+                  }))}
                   dataSource={filteredIssues}
                   rowKey="id"
                   style={{ 
                     background: isDarkMode ? "#1f1f1f" : "#fff",
                     borderRadius: "8px"
                   }}
+                  scroll={{ x: isMobile ? 800 : undefined }}
                 />
               </Space>
             </Col>
 
             {/* Sağ Taraf - Proje Bilgileri ve Kilometre Taşları */}
-            <Col span={8}>
+            <Col xs={24} lg={8}>
               <Card
                 title={
                   <Space>
@@ -323,7 +328,7 @@ const ProjectIssues: FC = () => {
                 }
                 style={{
                   background: isDarkMode ? "#1f1f1f" : "#fff",
-                  position: "sticky",
+                  position: isMobile ? "relative" : "sticky",
                   top: 24,
                 }}
               >
@@ -432,11 +437,12 @@ const ProjectIssues: FC = () => {
               {t('actions.close')}
             </Button>,
           ]}
-          width={800}
+          width={isMobile ? "100%" : 800}
+          style={{ top: isMobile ? 0 : 100 }}
         >
           {selectedIssue && (
             <Space direction="vertical" style={{ width: "100%" }}>
-              <Title level={4}>{selectedIssue.title}</Title>
+              <Title level={4} style={{ fontSize: isMobile ? "18px" : "24px" }}>{selectedIssue.title}</Title>
               <Space wrap>
                 <Tag color={selectedIssue.state.color}>
                   {selectedIssue.state.name}

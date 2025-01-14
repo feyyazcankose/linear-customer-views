@@ -48,6 +48,11 @@
     "all_issues": "Tüm Görevler",
     "select_milestone": "Kilometre Taşı Seçin",
     "all_milestones": "Tüm Kilometre Taşları",
+    "total_issues": "Toplam Görev",
+    "completed": "Tamamlanan",
+    "in_progress": "Devam Eden",
+    "progress": "İlerleme",
+    "no_projects": "Proje bulunamadı",
     "priority_levels": {
       "no_priority": "Öncelik Yok",
       "high": "Yüksek",
