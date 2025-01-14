@@ -7,8 +7,10 @@
     "search": "Search",
     "language": "Language",
     "loading": "Loading",
+    "dark_mode": "Dark Mode",
+    "light_mode": "Light Mode",
     "error": {
-      "failed_fetch": "Failed to fetch",
+      "failed_fetch": "Failed to fetch data",
       "project_not_found": "Project not found or no access",
       "failed_verify": "Failed to verify project access",
       "project_id_missing": "Project ID is missing"

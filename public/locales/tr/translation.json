@@ -7,6 +7,8 @@
     "search": "Ara",
     "language": "Dil",
     "loading": "Yükleniyor",
+    "dark_mode": "Karanlık Mod",
+    "light_mode": "Aydınlık Mod",
     "error": {
       "failed_fetch": "Veriler alınamadı",
       "project_not_found": "Proje bulunamadı veya erişim yok",
