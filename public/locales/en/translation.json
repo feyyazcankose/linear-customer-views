@@ -40,6 +40,12 @@
     "updated_at": "Updated At",
     "description": "Description",
     "no_description": "No description available",
+    "timeline": "Project Timeline",
+    "duration": "Project Duration",
+    "start": "Start",
+    "target": "Target",
+    "milestones": "Milestones",
+    "all_issues": "All Issues",
     "select_milestone": "Select Milestone",
     "all_milestones": "All Milestones",
     "priority_levels": {

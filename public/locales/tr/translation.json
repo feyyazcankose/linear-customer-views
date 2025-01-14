@@ -40,6 +40,12 @@
     "updated_at": "Güncellenme Tarihi",
     "description": "Açıklama",
     "no_description": "Açıklama bulunmuyor",
+    "timeline": "Proje Zaman Çizelgesi",
+    "duration": "Proje Süresi",
+    "start": "Başlangıç",
+    "target": "Hedef",
+    "milestones": "Kilometre Taşları",
+    "all_issues": "Tüm Görevler",
     "select_milestone": "Kilometre Taşı Seçin",
     "all_milestones": "Tüm Kilometre Taşları",
     "priority_levels": {
