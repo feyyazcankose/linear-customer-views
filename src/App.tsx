@@ -4,8 +4,8 @@ import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { HelmetProvider } from "react-helmet-async";
 import Footer from "./components/Footer";
 import Login from "./pages/Login";
-import Projects from "./pages/Projects";
-import ProjectIssues from "./pages/ProjectIssues";
+import Projects from "./pages/Projects"; // Assuming this is the correct import
+import ProjectIssues from "./pages/ProjectIssues"; // Assuming this is the correct import
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -26,61 +26,57 @@ const AppContent = () => {
           style={{
             minHeight: "100vh",
             position: "relative",
-            paddingBottom: "60px",
+            // paddingBottom: "60px",
             background: isDarkMode ? "#141414" : "#fff",
           }}
         >
           <Routes>
-            {/* Public route */}
+            <Route path="/login" element={<Login />} />
             <Route
-              path="/login"
+              path="/"
               element={
                 <ProtectedRoute>
-                  <Login />
+                  {(() => {
+                    const projectAccess = localStorage.getItem('projectAccess');
+                    const defaultTeamId = import.meta.env.VITE_TEAM_ID || '';
+                    
+                    // VITE_TEAM_ID ile giriş yapılmışsa projects'e git
+                    if (projectAccess === defaultTeamId) {
+                      return <Navigate to="/projects" replace />;
+                    }
+                    
+                    // Başka bir ID ile giriş yapılmışsa o projenin detayına git
+                    if (projectAccess) {
+                      return <Navigate to={`/projects/${projectAccess}`} replace />;
+                    }
+                    
+                    // Giriş yapılmamışsa login'e git
+                    return <Navigate to="/login" replace />;
+                  })()}
                 </ProtectedRoute>
               }
             />
-
-            {/* Protected routes */}
             <Route
               path="/projects"
               element={
-                <ProtectedRoute requireAll>
-                  <>
-                    <Header />
-                    <Projects />
-                    <Footer />
-                  </>
+                <ProtectedRoute>
+                  <Header />
+                  <Projects />
+                  <Footer />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/project/:projectId/issues"
+              path="/projects/:projectId"
               element={
                 <ProtectedRoute>
-                  <>
-                    <Header />
-                    <ProjectIssues />
-                    <Footer />
-                  </>
+                  <Header />
+                  <ProjectIssues />
+                  <Footer />
                 </ProtectedRoute>
               }
             />
-            {/* <Route 
-              path="/project/:projectId/request" 
-              element={
-                <ProtectedRoute>
-                  <>
-                    <Header />
-                    <CustomerRequest />
-                    <Footer />
-                  </>
-                </ProtectedRoute>
-              } 
-            /> */}
-
-            {/* Default redirect */}
-            <Route path="/" element={<Navigate to="/projects" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </BrowserRouter>

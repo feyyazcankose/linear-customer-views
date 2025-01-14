@@ -138,7 +138,10 @@ export const getProjectIssues = async (projectId: string) => {
   try {
     // Proje erişim kontrolü
     const projectAccess = localStorage.getItem('projectAccess');
-    if (projectAccess !== 'all' && projectAccess !== projectId) {
+    const defaultTeamId = import.meta.env.VITE_TEAM_ID || '';
+
+    // VITE_TEAM_ID ile giriş yapılmışsa veya projenin sahibiyse erişim ver
+    if (projectAccess !== defaultTeamId && projectAccess !== projectId) {
       throw new Error('No access to this project');
     }
 

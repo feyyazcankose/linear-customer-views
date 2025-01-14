@@ -22,12 +22,18 @@
   },
   "login": {
     "title": "Giriş - Linear View",
+    "welcome": "Linear View'e Hoş Geldiniz",
     "form": {
       "project_id": "Proje ID",
       "project_id_placeholder": "Proje ID'nizi girin",
       "submit": "Giriş Yap"
     },
-    "description": "Görevleri görüntülemek ve ilerlemeyi takip etmek için Linear proje ID'nizi girin"
+    "description": "Linear projelerinizi yönetmek ve görevlerinizi takip etmek için giriş yapın",
+    "quote": {
+      "title": "İlerleyişinizi Takip Edin",
+      "description": "Linear projelerinizi etkili bir şekilde yönetin, görevleri takip edin ve ekibinizle tek bir platformda işbirliği yapın"
+    },
+    "copyright": "Telif Hakkı "
   },
   "project": {
     "title": "Proje Görevleri",

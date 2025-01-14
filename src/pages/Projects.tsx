@@ -80,7 +80,7 @@ export default function Projects() {
   );
 
   const handleCardClick = (projectId: string) => {
-    navigate(`/project/${projectId}/issues`);
+    navigate(`/projects/${projectId}`);
   };
 
   const toggleDescription = (projectId: string, e: React.MouseEvent) => {

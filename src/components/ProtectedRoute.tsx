@@ -1,49 +1,37 @@
-import React, { useEffect } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requireAll?: boolean;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAll = false }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const projectId = localStorage.getItem('projectAccess');
+  const defaultTeamId = import.meta.env.VITE_TEAM_ID || '';
   const location = useLocation();
-  const navigate = useNavigate();
-  const projectAccess = localStorage.getItem('projectAccess');
 
-  useEffect(() => {
-    // Eğer giriş yapılmamışsa
-    if (!projectAccess) {
-      navigate('/login', { replace: true });
-      return;
-    }
-
-    // Eğer tüm projelere erişim gerekiyorsa ve kullanıcının bu yetkisi yoksa
-    if (requireAll && projectAccess !== 'all') {
-      navigate('/login', { replace: true });
-      return;
-    }
-
-    // Eğer belirli bir projeye erişim kontrol ediliyorsa
-    if (!requireAll && projectAccess !== 'all') {
-      const projectId = location.pathname.split('/')[2];
-      if (projectId && projectId !== projectAccess) {
-        navigate('/login', { replace: true });
-      }
-    }
-  }, [location.pathname, projectAccess, requireAll, navigate]);
-
-  // Login sayfasında değilsek ve giriş yapılmamışsa
-  if (!projectAccess && location.pathname !== '/login') {
+  // Eğer hiç giriş yapılmamışsa login'e yönlendir
+  if (!projectId) {
     return <Navigate to="/login" replace />;
   }
 
-  // Giriş yapılmışsa ve login sayfasındaysak
-  if (projectAccess && location.pathname === '/login') {
-    if (projectAccess === 'all') {
-      return <Navigate to="/projects" replace />;
-    } else {
-      return <Navigate to={`/project/${projectAccess}/issues`} replace />;
+  // VITE_TEAM_ID ile giriş yapılmışsa tüm sayfalara erişim ver
+  if (projectId === defaultTeamId) {
+    return <>{children}</>;
+  }
+
+  // Projects sayfasına erişim kontrolü
+  if (location.pathname === '/projects') {
+    // VITE_TEAM_ID ile giriş yapılmamışsa projenin detayına yönlendir
+    return <Navigate to={`/projects/${projectId}`} replace />;
+  }
+
+  // Proje detay sayfası için kontrol
+  if (location.pathname.startsWith('/projects/')) {
+    const urlProjectId = location.pathname.split('/')[2];
+    // Eğer URL'deki proje ID'si ile giriş yapılan ID eşleşmiyorsa login'e yönlendir
+    if (urlProjectId !== projectId) {
+      return <Navigate to="/login" replace />;
     }
   }
 

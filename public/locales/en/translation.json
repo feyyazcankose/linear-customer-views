@@ -22,12 +22,18 @@
   },
   "login": {
     "title": "Login - Linear View",
+    "welcome": "Welcome to Linear View",
     "form": {
       "project_id": "Project ID",
       "project_id_placeholder": "Enter your project ID",
-      "submit": "Login"
+      "submit": "Sign In"
     },
-    "description": "Enter your Linear project ID to view issues and track progress"
+    "description": "Sign in to manage your Linear projects and track your tasks",
+    "quote": {
+      "title": "Track Your Progress",
+      "description": "Manage your Linear projects efficiently, track tasks, and collaborate with your team in one place"
+    },
+    "copyright": "Copyright"
   },
   "project": {
     "title": "Project Issues",
