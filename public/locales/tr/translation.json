@@ -1,0 +1,63 @@
+{
+  "common": {
+    "welcome": "Hoş Geldiniz",
+    "issues": "Görevler",
+    "projects": "Projeler",
+    "settings": "Ayarlar",
+    "search": "Ara",
+    "language": "Dil",
+    "loading": "Yükleniyor",
+    "error": {
+      "failed_fetch": "Veriler alınamadı",
+      "project_not_found": "Proje bulunamadı veya erişim yok",
+      "failed_verify": "Proje erişimi doğrulanamadı",
+      "project_id_missing": "Proje ID'si eksik"
+    },
+    "success": {
+      "login": "Giriş başarılı",
+      "login_full_access": "Giriş başarılı - Tam erişim verildi"
+    }
+  },
+  "login": {
+    "title": "Giriş - Linear View",
+    "form": {
+      "project_id": "Proje ID",
+      "project_id_placeholder": "Proje ID'nizi girin",
+      "submit": "Giriş Yap"
+    },
+    "description": "Görevleri görüntülemek ve ilerlemeyi takip etmek için Linear proje ID'nizi girin"
+  },
+  "project": {
+    "title": "Proje Görevleri",
+    "create": "Görev Oluştur",
+    "filter": "Görevleri Filtrele",
+    "status": "Durum",
+    "priority": "Öncelik",
+    "details": "Görev Detayları",
+    "milestone": "Kilometre Taşı",
+    "labels": "Etiketler",
+    "created_at": "Oluşturulma Tarihi",
+    "updated_at": "Güncellenme Tarihi",
+    "description": "Açıklama",
+    "no_description": "Açıklama bulunmuyor",
+    "select_milestone": "Kilometre Taşı Seçin",
+    "all_milestones": "Tüm Kilometre Taşları",
+    "priority_levels": {
+      "no_priority": "Öncelik Yok",
+      "high": "Yüksek",
+      "medium": "Orta",
+      "low": "Düşük"
+    },
+    "filters": {
+      "search_placeholder": "Görevlerde ara...",
+      "select_labels": "Etiket Seçin",
+      "select_states": "Durum Seçin"
+    }
+  },
+  "actions": {
+    "logout": "Çıkış Yap",
+    "close": "Kapat",
+    "save": "Kaydet",
+    "cancel": "İptal"
+  }
+}

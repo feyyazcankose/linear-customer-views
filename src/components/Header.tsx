@@ -5,6 +5,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { getOrganization } from '../services/linearClient';
 import { useTheme } from '../context/ThemeContext';
 import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const { Text } = Typography;
 
@@ -18,6 +20,7 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const [organization, setOrganization] = useState<Organization | null>(null);
   const { isDarkMode, toggleTheme } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchOrganization = async () => {
@@ -33,54 +36,40 @@ const Header: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('projectAccess');
-    navigate('/login');
+    navigate('/');
   };
 
   return (
     <>
       <Helmet>
-        <title>{organization?.name ? `${organization.name} - Linear View` : 'Linear View'}</title>
-        {organization?.logoUrl && (
-          <link rel="icon" type="image/png" href={organization.logoUrl} />
-        )}
+        <title>{organization?.name || t('common.loading')} - Linear View</title>
       </Helmet>
 
-      <div style={{
-        padding: '16px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        top: 0,
-        backgroundColor: isDarkMode ? '#141414' : 'white',
-        zIndex: 1000
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <NavLink to="/projects" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} >
-            {organization?.logoUrl && (
-              <img 
-                src={organization.logoUrl} 
-                alt={organization.name}
-                style={{ height: '24px', width: 'auto' }}
-              />
-            )}
-            <Text strong style={{ fontSize: '16px', color: isDarkMode ? '#fff' : undefined }}>
-              {organization?.name}
-            </Text>
-          </NavLink>
-        </div>
-
+      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '10px 20px', borderBottom: '1px solid #f0f0f0' }}>
         <Space>
+          {organization?.logoUrl && (
+            <img src={organization.logoUrl} alt={organization.name} style={{ height: '30px' }} />
+          )}
+          <Text strong>{organization?.name}</Text>
+        </Space>
+
+        <Space style={{ marginLeft: 'auto' }}>
+          <NavLink to="/projects" style={{ color: 'inherit', textDecoration: 'none' }}>
+            {t('common.projects')}
+          </NavLink>
+          <LanguageSwitcher />
           <Button
-            type="text"
             icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
             onClick={toggleTheme}
+            type="text"
           />
-          <Button 
-            type="text" 
+          <Button
             icon={<LogoutOutlined />}
             onClick={handleLogout}
+            type="text"
+            danger
           >
-            Logout
+            {t('actions.logout')}
           </Button>
         </Space>
       </div>

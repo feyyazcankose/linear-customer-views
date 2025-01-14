@@ -15,6 +15,7 @@ import {
   Input,
   Select,
   message,
+  Button,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { CalendarOutlined, SearchOutlined } from "@ant-design/icons";
@@ -24,8 +25,9 @@ import { useTheme } from "../context/ThemeContext";
 import { Helmet } from "react-helmet-async";
 import ReactMarkdown from "react-markdown";
 import useDebounce from "../hooks/useDebounce";
+import { useTranslation } from 'react-i18next';
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 interface ProjectMilestone {
   id: string;
@@ -71,6 +73,7 @@ interface ProjectData {
 }
 
 const ProjectIssues: FC = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
@@ -114,10 +117,10 @@ const ProjectIssues: FC = () => {
   };
 
   const priorityMap = {
-    0: { text: "No Priority", color: "#6B7280" },
-    1: { text: "High", color: "#EF4444" },
-    2: { text: "Medium", color: "#F59E0B" },
-    3: { text: "Low", color: "#10B981" },
+    0: { text: t('project.priority_levels.no_priority'), color: "#6B7280" },
+    1: { text: t('project.priority_levels.high'), color: "#EF4444" },
+    2: { text: t('project.priority_levels.medium'), color: "#F59E0B" },
+    3: { text: t('project.priority_levels.low'), color: "#10B981" },
   };
 
   const formatDateTime = (dateString: string) => {
@@ -178,52 +181,39 @@ const ProjectIssues: FC = () => {
 
   const columns: ColumnsType<Issue> = [
     {
-      title: "Title",
+      title: t('project.title'),
       dataIndex: "title",
       key: "title",
       render: (text: string, record: Issue) => (
-        <a
-          onClick={() => showIssueDetails(record)}
-          style={{ color: isDarkMode ? "#1890ff" : "#1677ff" }}
-        >
-          {text}
-        </a>
+        <a onClick={() => showIssueDetails(record)}>{text}</a>
       ),
     },
     {
-      title: "Priority",
-      dataIndex: "priority",
-      key: "priority",
-      render: (priority: number) => (
-        <Tag color={priorityMap[priority as keyof typeof priorityMap]?.color}>
-          {priorityMap[priority as keyof typeof priorityMap]?.text}
-        </Tag>
-      ),
-    },
-    {
-      title: "Status",
+      title: t('project.status'),
       dataIndex: ["state", "name"],
-      key: "status",
+      key: "state",
       render: (text: string, record: Issue) => (
         <Tag color={record.state.color}>{text}</Tag>
       ),
     },
     {
-      title: "Milestone",
-      key: "milestone",
-      render: (_, record: Issue) =>
-        record.projectMilestone && (
-          <Tag color="blue">{record.projectMilestone.name}</Tag>
-        ),
+      title: t('project.priority'),
+      dataIndex: "priority",
+      key: "priority",
+      render: (priority: number) => (
+        <Tag color={priorityMap[priority as keyof typeof priorityMap].color}>
+          {priorityMap[priority as keyof typeof priorityMap].text}
+        </Tag>
+      ),
     },
     {
-      title: "Labels",
+      title: t('project.labels'),
       dataIndex: "labels",
       key: "labels",
-      render: (labels?: { nodes: Array<{ name: string; color: string }> }) => (
+      render: (labels: { nodes: Array<{ name: string; color: string }> }) => (
         <Space size={[0, 8]} wrap>
-          {labels?.nodes?.map((label, index) => (
-            <Tag key={index} color={label.color}>
+          {labels?.nodes.map((label) => (
+            <Tag key={label.name} color={label.color}>
               {label.name}
             </Tag>
           ))}
@@ -231,333 +221,181 @@ const ProjectIssues: FC = () => {
       ),
     },
     {
-      title: "Created",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => formatDateTime(date),
+      title: t('project.milestone'),
+      dataIndex: ["projectMilestone", "name"],
+      key: "milestone",
+      render: (text: string, record: Issue) => (
+        <Space>
+          {record.projectMilestone && (
+            <>
+              <CalendarOutlined />
+              <span>{text}</span>
+            </>
+          )}
+        </Space>
+      ),
     },
   ];
+
+  const getAllLabels = () => {
+    const labels = projectData?.issues?.nodes.flatMap(
+      (issue) => issue.labels?.nodes.map((label) => label.name) || []
+    );
+    return Array.from(new Set(labels)).map((label) => ({
+      label,
+      value: label,
+    }));
+  };
+
+  const getAllStates = () => {
+    const states = projectData?.issues?.nodes.map((issue) => issue.state.name);
+    return Array.from(new Set(states)).map((state) => ({
+      label: state,
+      value: state,
+    }));
+  };
 
   return (
     <>
       <Helmet>
-        <title>
-          {projectData?.name ? `${projectData.name} Issues` : "Project Issues"}{" "}
-          - Linear View
-        </title>
+        <title>{projectData ? `${projectData.name} - ${t('project.title')}` : t('common.loading')}</title>
       </Helmet>
 
-      <Layout
-        style={{
-          minHeight: "100vh",
-          background: isDarkMode ? "#141414" : "#fff",
-        }}
-      >
-        <div style={{ padding: "24px" }}>
-          <Row gutter={24}>
-            <Col span={16}>
-              <Space
-                direction="vertical"
-                size="large"
-                style={{ width: "100%" }}
-              >
-                <Space wrap>
-                  <Input
-                    placeholder="Search issues"
-                    prefix={<SearchOutlined />}
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    style={{ width: 200 }}
-                  />
-                  <Select
-                    mode="multiple"
-                    placeholder="Filter by state"
-                    value={selectedStates}
-                    onChange={setSelectedStates}
-                    style={{ width: 200 }}
-                    options={Array.from(
-                      new Set(
-                        projectData?.issues?.nodes.map(
-                          (issue) => issue.state.name
-                        )
-                      )
-                    ).map((state) => ({
-                      label: state,
-                      value: state,
-                    }))}
-                  />
-                  <Select
-                    mode="multiple"
-                    placeholder="Filter by label"
-                    value={selectedLabels}
-                    onChange={setSelectedLabels}
-                    style={{ width: 200 }}
-                    options={Array.from(
-                      new Set(
-                        projectData?.issues?.nodes.flatMap(
-                          (issue) =>
-                            issue.labels?.nodes.map((label) => label.name) || []
-                        )
-                      )
-                    ).map((label) => ({
-                      label,
-                      value: label,
-                    }))}
-                  />
-                </Space>
-
-                {loading ? (
-                  <div style={{ textAlign: "center", padding: "50px" }}>
-                    <Spin size="large" />
-                  </div>
-                ) : (
-                  <Table
-                    columns={columns}
-                    dataSource={filteredIssues}
-                    rowKey="id"
-                    style={{
-                      background: isDarkMode ? "#1f1f1f" : "#fff",
-                      borderRadius: "8px",
-                    }}
-                  />
-                )}
-              </Space>
-            </Col>
-
-            <Col span={8}>
-              <Card
-                title={
-                  <Space>
-                    <CalendarOutlined />
-                    <span>Project Timeline</span>
+      <Layout style={{ padding: "24px", background: isDarkMode ? "#141414" : "#fff" }}>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            <Spin size="large" />
+          </div>
+        ) : (
+          <>
+            <Row gutter={[16, 16]}>
+              <Col span={24}>
+                <Card>
+                  <Space direction="vertical" style={{ width: "100%" }}>
+                    <Input
+                      placeholder={t('project.filters.search_placeholder')}
+                      prefix={<SearchOutlined />}
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                    />
+                    <Space wrap>
+                      <Select
+                        mode="multiple"
+                        style={{ minWidth: 200 }}
+                        placeholder={t('project.filters.select_labels')}
+                        value={selectedLabels}
+                        onChange={setSelectedLabels}
+                        options={getAllLabels()}
+                      />
+                      <Select
+                        mode="multiple"
+                        style={{ minWidth: 200 }}
+                        placeholder={t('project.filters.select_states')}
+                        value={selectedStates}
+                        onChange={setSelectedStates}
+                        options={getAllStates()}
+                      />
+                      <Select
+                        style={{ minWidth: 200 }}
+                        placeholder={t('project.select_milestone')}
+                        value={selectedMilestone}
+                        onChange={setSelectedMilestone}
+                        options={[
+                          { value: "all", label: t('project.all_milestones') },
+                          ...(projectData?.projectMilestones?.nodes || []).map(
+                            (milestone) => ({
+                              value: milestone.id,
+                              label: milestone.name,
+                            })
+                          ),
+                        ]}
+                      />
+                    </Space>
                   </Space>
-                }
-                style={{
-                  background: isDarkMode ? "#1f1f1f" : "#fff",
-                  position: "sticky",
-                  top: 24,
-                }}
-              >
-                <Space
-                  direction="vertical"
-                  size="middle"
-                  style={{ width: "100%" }}
-                >
-                  <div>
-                    <Text type="secondary">Project Duration</Text>
-                    <div style={{ marginTop: 8 }}>
-                      {projectData?.startDate && (
-                        <Tag color="blue">
-                          Start: {formatDate(projectData.startDate)}
-                        </Tag>
-                      )}
-                      {projectData?.targetDate && (
-                        <Tag color="orange">
-                          Target: {formatDate(projectData.targetDate)}
-                        </Tag>
-                      )}
-                    </div>
-                  </div>
+                </Card>
+              </Col>
+            </Row>
 
-                  {projectData?.description && (
+            <Table
+              columns={columns}
+              dataSource={filteredIssues}
+              rowKey="id"
+              style={{ marginTop: "16px" }}
+            />
+
+            <Modal
+              title={t('project.details')}
+              open={isModalVisible}
+              onCancel={() => setIsModalVisible(false)}
+              footer={[
+                <Button key="close" onClick={() => setIsModalVisible(false)}>
+                  {t('actions.close')}
+                </Button>,
+              ]}
+              width={800}
+            >
+              {selectedIssue && (
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Title level={4}>{selectedIssue.title}</Title>
+                  <Space wrap>
+                    <Tag color={selectedIssue.state.color}>
+                      {selectedIssue.state.name}
+                    </Tag>
+                    <Tag
+                      color={
+                        priorityMap[
+                          selectedIssue.priority as keyof typeof priorityMap
+                        ].color
+                      }
+                    >
+                      {
+                        priorityMap[
+                          selectedIssue.priority as keyof typeof priorityMap
+                        ].text
+                      }
+                    </Tag>
+                    {selectedIssue.labels?.nodes.map((label) => (
+                      <Tag key={label.name} color={label.color}>
+                        {label.name}
+                      </Tag>
+                    ))}
+                  </Space>
+                  <div>
+                    <Text type="secondary">
+                      {t('project.created_at')}: {formatDateTime(selectedIssue.createdAt)}
+                    </Text>
+                    <br />
+                    <Text type="secondary">
+                      {t('project.updated_at')}: {formatDateTime(selectedIssue.updatedAt)}
+                    </Text>
+                  </div>
+                  {selectedIssue.projectMilestone && (
                     <div>
-                      <Text type="secondary">Description</Text>
-                      <div style={{ marginTop: 8 }}>
-                        <ReactMarkdown>{projectData.description}</ReactMarkdown>
-                      </div>
+                      <Text strong>{t('project.milestone')}:</Text>{" "}
+                      {selectedIssue.projectMilestone.name}
+                      {selectedIssue.projectMilestone.targetDate && (
+                        <Text type="secondary">
+                          {" "}
+                          ({formatDate(selectedIssue.projectMilestone.targetDate)})
+                        </Text>
+                      )}
                     </div>
                   )}
-
                   <div>
-                    <Text strong>Milestones</Text>
-                    <Timeline style={{ marginTop: 8 }}>
-                      <Timeline.Item>
-                        <div
-                          onClick={() => setSelectedMilestone("all")}
-                          style={{
-                            cursor: "pointer",
-                            padding: "8px",
-                            background:
-                              selectedMilestone === "all"
-                                ? isDarkMode
-                                  ? "#2a2a2a"
-                                  : "#f0f0f0"
-                                : "transparent",
-                            borderRadius: "4px",
-                            marginBottom: "4px",
-                          }}
-                        >
-                          <Text strong>All Issues</Text>
-                        </div>
-                      </Timeline.Item>
-                      {[...(projectData?.projectMilestones?.nodes || [])]
-                        .sort((a, b) => {
-                          if (!a.targetDate) return 1;
-                          if (!b.targetDate) return -1;
-                          return (
-                            new Date(a.targetDate).getTime() -
-                            new Date(b.targetDate).getTime()
-                          );
-                        })
-                        .map((milestone) => (
-                          <Timeline.Item key={milestone.id}>
-                            <div
-                              onClick={() => setSelectedMilestone(milestone.id)}
-                              style={{
-                                cursor: "pointer",
-                                padding: "8px",
-                                background:
-                                  selectedMilestone === milestone.id
-                                    ? isDarkMode
-                                      ? "#2a2a2a"
-                                      : "#f0f0f0"
-                                    : "transparent",
-                                borderRadius: "4px",
-                                marginBottom: "4px",
-                              }}
-                            >
-                              <Text strong>{milestone.name}</Text>
-                              {milestone.targetDate && (
-                                <div
-                                  style={{
-                                    fontSize: "12px",
-                                    color: "#888",
-                                    marginTop: 4,
-                                  }}
-                                >
-                                  Target: {formatDate(milestone.targetDate)}
-                                </div>
-                              )}
-                              {milestone.description && (
-                                <div style={{ marginTop: 4, fontSize: "14px" }}>
-                                  {milestone.description}
-                                </div>
-                              )}
-                            </div>
-                          </Timeline.Item>
-                        ))}
-                    </Timeline>
+                    <Text strong>{t('project.description')}:</Text>
+                    <div style={{ marginTop: "8px" }}>
+                      {selectedIssue.description ? (
+                        <ReactMarkdown>{selectedIssue.description}</ReactMarkdown>
+                      ) : (
+                        <Text type="secondary">{t('project.no_description')}</Text>
+                      )}
+                    </div>
                   </div>
                 </Space>
-              </Card>
-            </Col>
-          </Row>
-        </div>
-
-        <Modal
-          title={selectedIssue?.title}
-          open={isModalVisible}
-          onCancel={() => setIsModalVisible(false)}
-          footer={null}
-          width={800}
-        >
-          {selectedIssue && (
-            <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-              <div>
-                <Text strong style={{ color: isDarkMode ? "#fff" : undefined }}>
-                  Status:
-                </Text>
-                <Tag
-                  color={selectedIssue.state.color}
-                  style={{ marginLeft: 8 }}
-                >
-                  {selectedIssue.state.name}
-                </Tag>
-              </div>
-
-              <div>
-                <Text strong style={{ color: isDarkMode ? "#fff" : undefined }}>
-                  Priority:
-                </Text>
-                <Tag
-                  color={
-                    priorityMap[
-                      selectedIssue.priority as keyof typeof priorityMap
-                    ]?.color
-                  }
-                  style={{ marginLeft: 8 }}
-                >
-                  {
-                    priorityMap[
-                      selectedIssue.priority as keyof typeof priorityMap
-                    ]?.text
-                  }
-                </Tag>
-              </div>
-
-              {selectedIssue.projectMilestone && (
-                <div>
-                  <Text
-                    strong
-                    style={{ color: isDarkMode ? "#fff" : undefined }}
-                  >
-                    Milestone:
-                  </Text>
-                  <Tag color="blue" style={{ marginLeft: 8 }}>
-                    {selectedIssue.projectMilestone.name}
-                  </Tag>
-                  {selectedIssue.projectMilestone.targetDate && (
-                    <Text
-                      type="secondary"
-                      style={{ marginLeft: 8, fontSize: 12 }}
-                    >
-                      (Target:{" "}
-                      {formatDate(selectedIssue.projectMilestone.targetDate)})
-                    </Text>
-                  )}
-                </div>
               )}
-
-              {selectedIssue.labels?.nodes &&
-                selectedIssue.labels.nodes.length > 0 && (
-                  <div>
-                    <Text
-                      strong
-                      style={{ color: isDarkMode ? "#fff" : undefined }}
-                    >
-                      Labels:
-                    </Text>
-                    <div style={{ marginTop: 8 }}>
-                      <Space size={[0, 8]} wrap>
-                        {selectedIssue.labels.nodes.map((label, index) => (
-                          <Tag key={index} color={label.color}>
-                            {label.name}
-                          </Tag>
-                        ))}
-                      </Space>
-                    </div>
-                  </div>
-                )}
-
-              <div>
-                <Text strong style={{ color: isDarkMode ? "#fff" : undefined }}>
-                  Description:
-                </Text>
-                <div
-                  style={{
-                    marginTop: 8,
-                    padding: 16,
-                    background: isDarkMode ? "#141414" : "#f5f5f5",
-                    borderRadius: 8,
-                    color: isDarkMode ? "#fff" : undefined,
-                  }}
-                >
-                  <ReactMarkdown>
-                    {selectedIssue.description || "No description provided."}
-                  </ReactMarkdown>
-                </div>
-              </div>
-
-              <div>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  Created: {formatDateTime(selectedIssue.createdAt)}
-                  {selectedIssue.updatedAt !== selectedIssue.createdAt &&
-                    ` • Updated: ${formatDateTime(selectedIssue.updatedAt)}`}
-                </Text>
-              </div>
-            </Space>
-          )}
-        </Modal>
+            </Modal>
+          </>
+        )}
       </Layout>
     </>
   );

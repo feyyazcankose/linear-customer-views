@@ -5,6 +5,7 @@ import { BugOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icon
 import { checkProjectExists } from '../services/linearClient';
 import { Helmet } from 'react-helmet-async';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 
@@ -13,30 +14,29 @@ export default function Login() {
   const navigate = useNavigate();
   const { token } = theme.useToken();
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   const onFinish = async (values: { projectId: string }) => {
     setLoading(true);
     try {
-      // VITE_TEAM_ID ile giriş yapılırsa tüm projelere erişim sağlanır
       if (values.projectId === import.meta.env.VITE_TEAM_ID) {
         localStorage.setItem('projectAccess', 'all');
-        message.success('Login successful - Full access granted');
+        message.success(t('common.success.login_full_access'));
         navigate('/projects');
         return;
       }
 
-      // Normal proje ID'si kontrolü
       const exists = await checkProjectExists(values.projectId);
       if (exists) {
         localStorage.setItem('projectAccess', values.projectId);
-        message.success('Login successful');
+        message.success(t('common.success.login'));
         navigate('/projects');
       } else {
-        message.error('Project not found or no access');
+        message.error(t('common.error.project_not_found'));
       }
     } catch (error) {
       console.error('Error:', error);
-      message.error('Failed to verify project access');
+      message.error(t('common.error.failed_verify'));
     } finally {
       setLoading(false);
     }
@@ -45,15 +45,17 @@ export default function Login() {
   return (
     <>
       <Helmet>
-        <title>Login - Linear View</title>
+        <title>{t('login.title')}</title>
         <link rel="icon" type="image/png" href="/linear-logo.png" />
       </Helmet>
 
-      <div style={{ 
-        display: 'flex',
-        minHeight: '100vh', 
-        background: isDarkMode ? '#141414' : '#fff'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          minHeight: '100vh', 
+          background: isDarkMode ? '#141414' : '#fff'
+        }}
+      >
         {/* Sol taraf - Görsel */}
         <div style={{ 
           flex: '1',
@@ -100,7 +102,7 @@ export default function Login() {
         }}>
           <div style={{ maxWidth: '400px', width: '100%' }}>
             <Title level={3} style={{ marginBottom: '8px', color: isDarkMode ? '#fff' : '#111' }}>
-              Welcome back
+              {t('login.title')}
             </Title>
             <Text style={{ 
               display: 'block', 
@@ -108,7 +110,7 @@ export default function Login() {
               fontSize: '16px',
               color: isDarkMode ? '#999' : '#666'
             }}>
-              Enter your project ID to continue
+              {t('login.description')}
             </Text>
 
             <Form
@@ -120,12 +122,12 @@ export default function Login() {
               <Form.Item
                 name="projectId"
                 rules={[
-                  { required: true, message: 'Please input your project ID!' },
-                  { min: 3, message: 'Project ID must be at least 3 characters' }
+                  { required: true, message: t('login.form.project_id_placeholder') },
+                  { min: 3, message: t('login.form.project_id_min_length') }
                 ]}
               >
                 <Input.Password
-                  placeholder="Project ID"
+                  placeholder={t('login.form.project_id_placeholder')}
                   style={{ 
                     height: '50px',
                     borderRadius: '8px',
@@ -155,7 +157,7 @@ export default function Login() {
                     fontWeight: 500
                   }}
                 >
-                  Continue
+                  {t('login.form.submit')}
                 </Button>
               </Form.Item>
 

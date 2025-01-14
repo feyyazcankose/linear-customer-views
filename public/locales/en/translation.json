@@ -1,0 +1,63 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "issues": "Issues",
+    "projects": "Projects",
+    "settings": "Settings",
+    "search": "Search",
+    "language": "Language",
+    "loading": "Loading",
+    "error": {
+      "failed_fetch": "Failed to fetch",
+      "project_not_found": "Project not found or no access",
+      "failed_verify": "Failed to verify project access",
+      "project_id_missing": "Project ID is missing"
+    },
+    "success": {
+      "login": "Login successful",
+      "login_full_access": "Login successful - Full access granted"
+    }
+  },
+  "login": {
+    "title": "Login - Linear View",
+    "form": {
+      "project_id": "Project ID",
+      "project_id_placeholder": "Enter your project ID",
+      "submit": "Login"
+    },
+    "description": "Enter your Linear project ID to view issues and track progress"
+  },
+  "project": {
+    "title": "Project Issues",
+    "create": "Create Issue",
+    "filter": "Filter Issues",
+    "status": "Status",
+    "priority": "Priority",
+    "details": "Issue Details",
+    "milestone": "Milestone",
+    "labels": "Labels",
+    "created_at": "Created At",
+    "updated_at": "Updated At",
+    "description": "Description",
+    "no_description": "No description available",
+    "select_milestone": "Select Milestone",
+    "all_milestones": "All Milestones",
+    "priority_levels": {
+      "no_priority": "No Priority",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "filters": {
+      "search_placeholder": "Search issues...",
+      "select_labels": "Select Labels",
+      "select_states": "Select States"
+    }
+  },
+  "actions": {
+    "logout": "Logout",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}
