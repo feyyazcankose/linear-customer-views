@@ -1,4 +1,5 @@
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 interface Project {
   id: string;
@@ -10,11 +11,11 @@ interface Project {
 }
 
 const client = new ApolloClient({
-  uri: 'https://api.linear.app/graphql',
+  uri: "https://api.linear.app/graphql",
   cache: new InMemoryCache(),
   headers: {
-    authorization: import.meta.env.VITE_LINEAR_API_KEY || ''
-  }
+    authorization: import.meta.env.VITE_LINEAR_API_KEY || "",
+  },
 });
 
 export const GET_PROJECTS = gql`
@@ -39,28 +40,33 @@ export const GET_PROJECTS = gql`
 export const getProjects = async () => {
   try {
     const { data } = await client.query({
-      query: GET_PROJECTS
+      query: GET_PROJECTS,
     });
-    
+
     if (!data?.teams?.nodes) {
-      throw new Error('No teams found');
+      throw new Error("No teams found");
     }
-    
+
     const allProjects = data.teams.nodes.reduce((acc: Project[], team: any) => {
       const projects = team.projects?.nodes || [];
-      return [...acc, ...projects.map((project: any): Project => ({
-        id: project.id,
-        name: project.name,
-        description: project.description,
-        startDate: project.startDate,
-        targetDate: project.targetDate,
-        state: project.state || 'backlog'
-      }))];
+      return [
+        ...acc,
+        ...projects.map(
+          (project: any): Project => ({
+            id: project.id,
+            name: project.name,
+            description: project.description,
+            startDate: project.startDate,
+            targetDate: project.targetDate,
+            state: project.state || "backlog",
+          })
+        ),
+      ];
     }, []);
 
     return { nodes: allProjects };
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    console.error("Error fetching projects:", error);
     throw error;
   }
 };
@@ -137,21 +143,21 @@ export const GET_PROJECT_EXISTS = gql`
 export const getProjectIssues = async (projectId: string) => {
   try {
     // Proje erişim kontrolü
-    const projectAccess = localStorage.getItem('projectAccess');
-    const defaultTeamId = import.meta.env.VITE_TEAM_ID || '';
+    const projectAccess = localStorage.getItem("projectAccess");
+    const defaultTeamId = import.meta.env.VITE_TEAM_ID || "";
 
     // VITE_TEAM_ID ile giriş yapılmışsa veya projenin sahibiyse erişim ver
     if (projectAccess !== defaultTeamId && projectAccess !== projectId) {
-      throw new Error('No access to this project');
+      throw new Error("No access to this project");
     }
 
     const { data } = await client.query({
       query: GET_PROJECT_ISSUES,
-      variables: { projectId }
+      variables: { projectId },
     });
     return data.project;
   } catch (error) {
-    console.error('Error fetching project issues:', error);
+    console.error("Error fetching project issues:", error);
     throw error;
   }
 };
@@ -164,12 +170,14 @@ export const getProjectIssueCount = async (projectId: string) => {
     });
     return data.project.issues.nodes.length;
   } catch (error) {
-    console.error('Error fetching project issue count:', error);
+    console.error("Error fetching project issue count:", error);
     return 0;
   }
 };
 
-export const checkProjectExists = async (projectId: string): Promise<boolean> => {
+export const checkProjectExists = async (
+  projectId: string
+): Promise<boolean> => {
   try {
     const { data } = await client.query({
       query: GET_PROJECT_EXISTS,
@@ -177,7 +185,7 @@ export const checkProjectExists = async (projectId: string): Promise<boolean> =>
     });
     return !!data.project;
   } catch (error) {
-    console.error('Error checking project:', error);
+    console.error("Error checking project:", error);
     return false;
   }
 };
@@ -199,7 +207,7 @@ export const getOrganization = async () => {
     });
     return data.organization;
   } catch (error) {
-    console.error('Error fetching organization:', error);
+    console.error("Error fetching organization:", error);
     return null;
   }
 };
@@ -240,7 +248,7 @@ interface CreateIssueInput {
   projectId: string;
   title: string;
   description: string;
-  priority: 'HIGH' | 'MEDIUM' | 'LOW' | 'NO_PRIORITY';
+  priority: "HIGH" | "MEDIUM" | "LOW" | "NO_PRIORITY";
 }
 
 // Priority değerlerini Linear API'nin beklediği formata çevirme
@@ -282,26 +290,20 @@ const CREATE_LABEL = gql`
   }
 `;
 
-interface LabelCreateInput {
-  name: string;
-  teamId: string;
-  color: string;
-}
-
 export const createIssue = async (input: CreateIssueInput) => {
   try {
     // Önce projenin team bilgisini al
     const teamData = await client.query({
       query: GET_PROJECT_TEAM,
       variables: {
-        projectId: input.projectId
-      }
+        projectId: input.projectId,
+      },
     });
 
-    console.log('Team Data:', teamData);
+    console.log("Team Data:", teamData);
 
     if (!teamData.data?.project?.teams?.nodes?.[0]) {
-      throw new Error('Could not find team data for project');
+      throw new Error("Could not find team data for project");
     }
 
     const teamId = teamData.data.project.teams.nodes[0].id;
@@ -320,13 +322,13 @@ export const createIssue = async (input: CreateIssueInput) => {
           input: {
             name: "Customer Request",
             teamId: teamId,
-            color: "#0052CC" // Mavi renk
-          }
-        }
+            color: "#0052CC", // Mavi renk
+          },
+        },
       });
 
       if (!labelResponse.data?.labelCreate?.success) {
-        throw new Error('Failed to create label');
+        throw new Error("Failed to create label");
       }
 
       customerRequestLabelId = labelResponse.data.labelCreate.label.id;
@@ -342,18 +344,18 @@ export const createIssue = async (input: CreateIssueInput) => {
           title: input.title,
           description: input.description,
           priority: priorityMap[input.priority],
-          labelIds: [customerRequestLabelId]
-        }
-      }
+          labelIds: [customerRequestLabelId],
+        },
+      },
     });
 
     if (!response.data?.issueCreate?.success) {
-      throw new Error('Failed to create issue');
+      throw new Error("Failed to create issue");
     }
 
     return response.data.issueCreate.issue;
   } catch (error) {
-    console.error('Error creating issue:', error);
+    console.error("Error creating issue:", error);
     throw error;
   }
 };

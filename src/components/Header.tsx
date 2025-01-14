@@ -1,14 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Space, Typography, Drawer, Menu } from 'antd';
-import { LogoutOutlined, MoonOutlined, SunOutlined, MenuOutlined, HomeOutlined, ProjectOutlined, GlobalOutlined } from '@ant-design/icons';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { getOrganization } from '../services/linearClient';
-import { useTheme } from '../context/ThemeContext';
-import { Helmet } from 'react-helmet-async';
-import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from './LanguageSwitcher';
+import React, { useEffect, useState } from "react";
+import { Button, Space, Typography, Drawer, Menu } from "antd";
+import {
+  LogoutOutlined,
+  MoonOutlined,
+  SunOutlined,
+  MenuOutlined,
+  ProjectOutlined,
+  GlobalOutlined,
+} from "@ant-design/icons";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { getOrganization } from "../services/linearClient";
+import { useTheme } from "../context/ThemeContext";
+import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface Organization {
   id: string;
@@ -30,8 +37,8 @@ const Header: React.FC = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -40,22 +47,25 @@ const Header: React.FC = () => {
         const orgData = await getOrganization();
         setOrganization(orgData);
       } catch (error) {
-        console.error('Error fetching organization:', error);
+        console.error("Error fetching organization:", error);
       }
     };
     fetchOrganization();
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('projectAccess');
-    navigate('/');
+    localStorage.removeItem("projectAccess");
+    navigate("/");
     setDrawerVisible(false);
   };
 
   const menuItems = (
     <>
-      <NavLink to="/projects" style={{ color: 'inherit', textDecoration: 'none' }}>
-        {t('common.projects')}
+      <NavLink
+        to="/projects"
+        style={{ color: "inherit", textDecoration: "none" }}
+      >
+        {t("common.projects")}
       </NavLink>
       <LanguageSwitcher />
       <Button
@@ -69,7 +79,7 @@ const Header: React.FC = () => {
         type="text"
         danger
       >
-        {t('actions.logout')}
+        {t("actions.logout")}
       </Button>
     </>
   );
@@ -77,26 +87,31 @@ const Header: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>{organization?.name || t('common.loading')} - Linear View</title>
+        <title>{organization?.name || t("common.loading")} - Linear View</title>
       </Helmet>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: isMobile ? '10px 15px' : '10px 20px',
-        background: isDarkMode ? '#1f1f1f' : '#fff',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-      }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: isMobile ? "10px 15px" : "10px 20px",
+          background: isDarkMode ? "#1f1f1f" : "#fff",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+        }}
+      >
         <Space>
-          <NavLink to="/" style={{ display: 'flex', alignItems: 'center', gap: "5px" }}>
+          <NavLink
+            to="/"
+            style={{ display: "flex", alignItems: "center", gap: "5px" }}
+          >
             {organization?.logoUrl && (
               <img
                 src={organization.logoUrl}
                 alt={organization.name}
-                style={{ height: isMobile ? '24px' : '30px' }}
+                style={{ height: isMobile ? "24px" : "30px" }}
               />
             )}
-            <Text strong style={{ fontSize: isMobile ? '14px' : '16px' }}>
+            <Text strong style={{ fontSize: isMobile ? "14px" : "16px" }}>
               {organization?.name}
             </Text>
           </NavLink>
@@ -108,16 +123,16 @@ const Header: React.FC = () => {
               icon={<MenuOutlined />}
               onClick={() => setDrawerVisible(true)}
               type="text"
-              style={{ marginLeft: 'auto' }}
+              style={{ marginLeft: "auto" }}
             />
             <Drawer
               title={
-                <Space style={{ width: '100%' }}>
+                <Space style={{ width: "100%" }}>
                   {organization?.logoUrl && (
                     <img
                       src={organization.logoUrl}
                       alt={organization.name}
-                      style={{ height: '24px' }}
+                      style={{ height: "24px" }}
                     />
                   )}
                   <Text strong>{organization?.name}</Text>
@@ -128,21 +143,21 @@ const Header: React.FC = () => {
               open={drawerVisible}
               bodyStyle={{
                 padding: 0,
-                background: isDarkMode ? '#141414' : '#fff'
+                background: isDarkMode ? "#141414" : "#fff",
               }}
               headerStyle={{
-                background: isDarkMode ? '#1f1f1f' : '#fff',
-                borderBottom: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`
+                background: isDarkMode ? "#1f1f1f" : "#fff",
+                borderBottom: `1px solid ${isDarkMode ? "#303030" : "#f0f0f0"}`,
               }}
               style={{
-                background: isDarkMode ? '#141414' : '#fff'
+                background: isDarkMode ? "#141414" : "#fff",
               }}
             >
               <Menu
                 mode="vertical"
                 style={{
-                  border: 'none',
-                  background: isDarkMode ? '#141414' : '#fff'
+                  border: "none",
+                  background: isDarkMode ? "#141414" : "#fff",
                 }}
                 selectedKeys={[location.pathname]}
               >
@@ -150,24 +165,29 @@ const Header: React.FC = () => {
                   key="/projects"
                   icon={<ProjectOutlined />}
                   style={{
-                    margin: '4px 8px',
-                    borderRadius: '6px'
+                    margin: "4px 8px",
+                    borderRadius: "6px",
                   }}
                 >
-                  <NavLink to="/projects" onClick={() => setDrawerVisible(false)}>
-                    {t('common.projects')}
+                  <NavLink
+                    to="/projects"
+                    onClick={() => setDrawerVisible(false)}
+                  >
+                    {t("common.projects")}
                   </NavLink>
                 </Menu.Item>
-                <Menu.Divider style={{
-                  background: isDarkMode ? '#303030' : '#f0f0f0',
-                  margin: '8px 0'
-                }} />
+                <Menu.Divider
+                  style={{
+                    background: isDarkMode ? "#303030" : "#f0f0f0",
+                    margin: "8px 0",
+                  }}
+                />
                 <Menu.Item
                   key="language"
                   icon={<GlobalOutlined />}
                   style={{
-                    margin: '4px 8px',
-                    borderRadius: '6px'
+                    margin: "4px 8px",
+                    borderRadius: "6px",
                   }}
                 >
                   <LanguageSwitcher />
@@ -177,35 +197,35 @@ const Header: React.FC = () => {
                   icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
                   onClick={toggleTheme}
                   style={{
-                    margin: '4px 8px',
-                    borderRadius: '6px'
+                    margin: "4px 8px",
+                    borderRadius: "6px",
                   }}
                 >
-                  {isDarkMode ? t('common.light_mode') : t('common.dark_mode')}
+                  {isDarkMode ? t("common.light_mode") : t("common.dark_mode")}
                 </Menu.Item>
-                <Menu.Divider style={{
-                  background: isDarkMode ? '#303030' : '#f0f0f0',
-                  margin: '8px 0'
-                }} />
+                <Menu.Divider
+                  style={{
+                    background: isDarkMode ? "#303030" : "#f0f0f0",
+                    margin: "8px 0",
+                  }}
+                />
                 <Menu.Item
                   key="logout"
                   icon={<LogoutOutlined />}
                   onClick={handleLogout}
                   danger
                   style={{
-                    margin: '4px 8px',
-                    borderRadius: '6px'
+                    margin: "4px 8px",
+                    borderRadius: "6px",
                   }}
                 >
-                  {t('actions.logout')}
+                  {t("actions.logout")}
                 </Menu.Item>
               </Menu>
             </Drawer>
           </>
         ) : (
-          <Space style={{ marginLeft: 'auto' }}>
-            {menuItems}
-          </Space>
+          <Space style={{ marginLeft: "auto" }}>{menuItems}</Space>
         )}
       </div>
     </>
